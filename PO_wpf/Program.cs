@@ -68,16 +68,26 @@ namespace projekt_PO
             
             //przypomnienie: metoda ma dodać pojazd do listy vehicles
         } 
-        public void nextFrame() {
+        public void nextFrame() { //przeskocz do następnej klatki (przesuwa wszystkie samoloty do przodu o ich wartośc prędkości)
             foreach (Vehicle vehicle in vehicles)
             {
-                double horizontalDisplacement = vehicle.Route.End.X - vehicle.Route.Begin.X; //przesuniecie na x-ach
+                double speed = vehicle.Speed;
+                double horizontalDisplacement = vehicle.Route.End.X - vehicle.Route.Begin.X; //przesuniecie na x-ach na route (o ile x-ów się przesuwa między początkiem trasy a końcem)
                 double verticalDisplacement = vehicle.Route.End.Y - vehicle.Route.Begin.Y; //przesuniecie na y
-                double routeLenght = Math.Sqrt(horizontalDisplacement * horizontalDisplacement + verticalDisplacement * verticalDisplacement);
+                double routeLenght = Math.Sqrt(Math.Abs(horizontalDisplacement * horizontalDisplacement + verticalDisplacement * verticalDisplacement));
+                
                 //finding angle
+                double angle = Math.Asin(verticalDisplacement / routeLenght);
+                double displaceByY = Math.Sin(angle) * speed * Math.Sign(verticalDisplacement);
+                double displaceByX = Math.Cos(angle) * speed * Math.Sign(horizontalDisplacement);
 
+
+                vehicle.Position.X += displaceByX;
+                vehicle.Position.Y += displaceByY;
+
+                //
             }
-        } //przeskocz do następnej klatki (przesuwa wszystkie samoloty do przodu o ich wartośc prędkości)
+        } 
     }
 
     public class Obstacle //nie dziedziczy z Map, jest wolnostojącym objektem
@@ -92,6 +102,7 @@ namespace projekt_PO
         }
         public Obstacle(double _x, double _y, double _width, double _lenght, double _height)
         {
+            position = new Point();
             Position.X = _x;
             Position.Y = _y;
             width = _width;
@@ -111,15 +122,18 @@ namespace projekt_PO
     public class Vehicle : Obstacle //Vehicle dziedziczy z obstacle
     {
         //Position odziedziczone z obstacle
-        protected double speed, height; //stała prędkość poruszania się samolotu oraz wysokosc na ktorej aktualnie się znajduje
+        private double height1; //stała prędkość poruszania się samolotu oraz wysokosc na ktorej aktualnie się znajduje
         private Segment route; //trasa samolotu zaczynająca się na (xstart, ystart) a kończąca sie (xend, yend) - patrz konstruktor
+        private double speed;
 
         public Segment Route { get => route; set => route = value; }
+        public double Speed { get => speed; set => speed = value; }
+        public double Height1 { get => height1; set => height1 = value; }
 
         public void changeRoute(double _xend, double _yend, double _height) //zmien trase lotu pojazdu. poczatkowa pozycja to ta na ktorej aktualnie znajduje sie samolot w aktualnej klatce, a argumenty opisywanej właśnie funkcji to nowy cel. heightnew to nowy pułap na którym leci pojazd
         {
             Route.End = new Point(_xend, _yend);
-            height = _height;
+            Height1 = _height;
         }
 
         //metoda public Vehicle detectCollisions() odziedziczony z Obstacle tutaj (dla przypomnienia)
@@ -131,8 +145,8 @@ namespace projekt_PO
     {
         Helicopter()
         {
-            speed = Constants.Helicopter.speed;
-            height = Constants.startingVehicleHeight;
+            Speed = Constants.Helicopter.speed;
+            Height1 = Constants.startingVehicleHeight;
         }
     }
 
@@ -140,8 +154,8 @@ namespace projekt_PO
     {
         Glider()
         {
-            speed = Constants.Glider.speed;
-            height = Constants.startingVehicleHeight;
+            Speed = Constants.Glider.speed;
+            Height1 = Constants.startingVehicleHeight;
         }
     }
 
@@ -149,8 +163,8 @@ namespace projekt_PO
     {
         Plane()
         {
-            speed = Constants.Plane.speed;
-            height = Constants.startingVehicleHeight;
+            Speed = Constants.Plane.speed;
+            Height1 = Constants.startingVehicleHeight;
         }
     }
 
@@ -158,8 +172,8 @@ namespace projekt_PO
     {
         Balloon()
         {
-            speed = Constants.Balloon.speed;
-            height = Constants.startingVehicleHeight;
+            Speed = Constants.Balloon.speed;
+            Height1 = Constants.startingVehicleHeight;
         }
     }
 
@@ -209,5 +223,4 @@ namespace projekt_PO
             end = _end;
         }
     }
-
 }
