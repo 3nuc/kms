@@ -78,19 +78,19 @@ namespace projekt_PO
 
     public class Obstacle //nie dziedziczy z Map, jest wolnostojącym objektem
     {
-        public Point position; //pozycja x, y przeszkody
-        float width, lenght, height; //szerokosc długosc wysokośc przeszkody (Nie ma tego w UMLu a powinno być)
+        public Point position = new Point(); //pozycja x, y przeszkody
+        public float width, lenght, height; //szerokosc długosc wysokośc przeszkody (Nie ma tego w UMLu a powinno być)
 
         public Obstacle()
         {
-            position.x = Constants.mapSizeX / 2;
-            position.y = Constants.mapSizeY / 2;
+            position.X = Constants.mapSizeX / 2;
+            position.Y = Constants.mapSizeY / 2;
             width = lenght = height = 20;
         }
         public Obstacle(float _x, float _y, float _width, float _lenght, float _height)
         {
-            position.x = _x;
-            position.y = _y;
+            position.X = _x;
+            position.Y = _y;
             width = _width;
             lenght = _lenght;
             height = _height;
@@ -156,18 +156,23 @@ namespace projekt_PO
 
     public class Point
     {
-        public float x
+        private float x,y;
+        public float X
         {
             get { return x; }
             set { x = value; }
         }
-        public float y
+        public float Y
         {
             get { return y; }
             set { y = value; }
         }
-        public Point(float _x, float _y) { x = _x; y = _y; }
+        public Point(float _x, float _y) { X = _x; Y = _y; }
 
+        public Point()
+        {
+            X = 0; Y = 0;
+        }
     }
 
     public class Segment //odcinek
