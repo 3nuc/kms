@@ -25,21 +25,16 @@ namespace PO_wpf
         public const string IMG = "pack://application:,,,/img/placeholder.bmp";
         public MainWindow()
         {
-            Obstacle h = new Obstacle(20,20,10,10,200);
+            Obstacle obs = new Obstacle(20,20,10,10,200);
 
             InitializeComponent();
 
-            DoubleAnimation da = new DoubleAnimation();
+            Image obsimg = AddObstacle(obs);
 
-            Image ob = AddObstacle(h);
-            //AddObstacle(new Obstacle(10, 10));
-            //AddObstacle(new Obstacle(100, 10));
-            //AddObstacle(new Obstacle(50, 50));
-
-            ast(ob);
+            ast(obsimg);
         }
 
-        private async void ast(Image img)
+        private async void ast(Image img)           //metoda asynchroniczna
         {
             await Task.Run(() => keepadding(img));
         }
@@ -50,7 +45,7 @@ namespace PO_wpf
             {
                 this.Dispatcher.Invoke(() =>        //gdy inny wątek chce zmienić UI wątku głównego używamy tej instrukcji
                 {
-                    img.Margin = new Thickness(img.Margin.Left, img.Margin.Top + 5, 0, 0);
+                    img.Margin = new Thickness(img.Margin.Left, 0, 0, img.Margin.Bottom + 5);
                 });
                 Task.Delay(1000).Wait();
             }
@@ -60,16 +55,31 @@ namespace PO_wpf
         {
             Image img = new Image();
 
-            img.Source = new BitmapImage(new Uri(IMG));
+            img.Source = new BitmapImage(new Uri(IMG));     //Uri do zdjęcia; Source ma typ ImageSource
 
             img.RenderTransformOrigin = new System.Windows.Point(0, 0);
             img.Margin = new Thickness(obs.Position.X, obs.Position.Y, 0, 0);
             img.Height = obs.Lenght;
             img.Width = obs.Width;
             img.HorizontalAlignment = HorizontalAlignment.Left;
-            img.VerticalAlignment = VerticalAlignment.Top;
+            img.VerticalAlignment = VerticalAlignment.Bottom;
 
             Map.Children.Add(img);
+
+            return img;
+        }
+
+        public Image AddVehicle(Vehicle vhc)
+        {
+            Image img = new Image();
+
+            img.Source = new BitmapImage(new Uri(IMG));
+
+            img.Margin = new Thickness(vhc.Position.X, 0, 0, vhc.Position.Y);
+            img.Height = 10;
+            img.Width = 10;
+            img.HorizontalAlignment = HorizontalAlignment.Left;
+            img.VerticalAlignment = VerticalAlignment.Bottom;
 
             return img;
         }

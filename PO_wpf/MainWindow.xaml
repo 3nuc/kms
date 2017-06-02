@@ -10,7 +10,7 @@
         <TextBlock Name="txtbox" HorizontalAlignment="Left" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
         <Border BorderBrush="Black" BorderThickness="2" HorizontalAlignment="Right" Height="500" VerticalAlignment="Top" Width="500" Margin="0,10,10,0">
             <Grid Name="Map">
-                <Image HorizontalAlignment="Left" Height="10" VerticalAlignment="Top" Width="10" x:Name="img1" Source="pack://application:,,,/img/placeholder.bmp" Margin="85,40,0,0" RenderTransformOrigin="0.467,0.467"/>
+                <Image HorizontalAlignment="Left" Height="10" VerticalAlignment="Bottom" Width="10" x:Name="img1" Source="pack://application:,,,/img/placeholder.bmp" Margin="68,0,0,23" RenderTransformOrigin="0.033,0.067"/>
             </Grid>
         </Border>
     </Grid>
