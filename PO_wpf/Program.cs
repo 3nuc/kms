@@ -82,12 +82,12 @@ namespace projekt_PO
 
     public class Obstacle //nie dziedziczy z Map, jest wolnostojącym objektem
     {
-        Point position; //pozycja x, y przeszkody
+        Point position = new Point(); //pozycja x, y przeszkody
         double width, lenght, height; //szerokosc długosc wysokośc przeszkody (Nie ma tego w UMLu a powinno być) WZGLĘDEM LEWEGO GORNEGO ROGU
 
         public Obstacle() //debug constructor i guess
         {
-            Position = new Point(Position.X = Constants.mapSizeX / 2, Position.y = Constants.mapSizeY / 2);
+            Position = new Point(Position.X = Constants.mapSizeX / 2, Position.Y = Constants.mapSizeY / 2);
             width = lenght = height = 20;
         }
         public Obstacle(double _x, double _y, double _width, double _lenght, double _height)
