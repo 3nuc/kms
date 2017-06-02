@@ -22,18 +22,27 @@ namespace PO_wpf
     {
         public MainWindow()
         {
-            Heli h = new Heli(10,100);
+            Obstacle h = new Obstacle(10,100);
+
+            InitializeComponent();
+
+            AddObstacle(h);
+            AddObstacle(new Obstacle(10, 10));
+            AddObstacle(new Obstacle(100, 10));
+            AddObstacle(new Obstacle(50, 50));
+        }
+
+        public void AddObstacle(Obstacle obs)
+        {
             Image hi = new Image();
 
-            hi.Source = new BitmapImage(new Uri(h.img));
+            hi.Source = new BitmapImage(new Uri(obs.img));
 
-            hi.Margin = new Thickness(8,8,0,0);
+            hi.Margin = new Thickness(obs.x, obs.y, 0, 0);
             hi.Height = 10;
             hi.Width = 10;
             hi.HorizontalAlignment = HorizontalAlignment.Left;
             hi.VerticalAlignment = VerticalAlignment.Top;
-
-            InitializeComponent();
 
             Map.Children.Add(hi);
         }
