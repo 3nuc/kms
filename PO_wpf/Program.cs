@@ -12,26 +12,26 @@ namespace projekt_PO
 
     public static class Constants //klasa zawierające wszystkie stałe używane w projekcie (wielkośc mapy, prędkości pojazdów)
     {
-        public const float mapSizeX = 1000; //podpiąć do MainWindow.xaml
-        public const float mapSizeY = 1000;
-        public const float startingVehicleHeight = 1000;
+        public const double mapSizeX = 1000; //podpiąć do MainWindow.xaml
+        public const double mapSizeY = 1000;
+        public const double startingVehicleHeight = 1000;
         public class Plane
         {
-            public const float speed = 200;
+            public const double speed = 200;
         }
         public class Balloon
         {
-            public const float speed = 50;
+            public const double speed = 50;
         }
 
         public class Glider
         {
-            public const float speed = 120;
+            public const double speed = 120;
         }
 
         public class Helicopter
         {
-            public const float speed = 150;
+            public const double speed = 150;
         }
     }
 
@@ -50,7 +50,7 @@ namespace projekt_PO
     {
         private List<Vehicle> vehicles; //klasa Vehicle jest później w kodzie
         private List<Obstacle> obstacles;
-        private float mapSizeX, mapSizeY; //rozmiar mapy
+        private double mapSizeX, mapSizeY; //rozmiar mapy
 
         Map()
         {
@@ -71,30 +71,38 @@ namespace projekt_PO
         public void nextFrame() {
             foreach (Vehicle vehicle in vehicles)
             {
-               // vehicle.position.
+                double horizontalDisplacement = vehicle.route.end.X - vehicle.route.begin.X; //przesuniecie na x-ach
+                double verticalDisplacement = vehicle.route.end.Y - vehicle.route.begin.Y; //przesuniecie na y
+                double routeLenght = Math.Sqrt(horizontalDisplacement * horizontalDisplacement + verticalDisplacement * verticalDisplacement);
+                //finding angle
+
             }
         } //przeskocz do następnej klatki (przesuwa wszystkie samoloty do przodu o ich wartośc prędkości)
     }
 
     public class Obstacle //nie dziedziczy z Map, jest wolnostojącym objektem
     {
-        public Point position; //pozycja x, y przeszkody
-        float width, lenght, height; //szerokosc długosc wysokośc przeszkody (Nie ma tego w UMLu a powinno być)
+        Point position; //pozycja x, y przeszkody
+        double width, lenght, height; //szerokosc długosc wysokośc przeszkody (Nie ma tego w UMLu a powinno być) WZGLĘDEM LEWEGO GORNEGO ROGU
 
-        public Obstacle()
+        public Obstacle() //debug constructor i guess
         {
-            position.x = Constants.mapSizeX / 2;
-            position.y = Constants.mapSizeY / 2;
+            Position = new Point(Position.X = Constants.mapSizeX / 2, Position.y = Constants.mapSizeY / 2);
             width = lenght = height = 20;
         }
-        public Obstacle(float _x, float _y, float _width, float _lenght, float _height)
+        public Obstacle(double _x, double _y, double _width, double _lenght, double _height)
         {
-            position.x = _x;
-            position.y = _y;
+            Position.X = _x;
+            Position.Y = _y;
             width = _width;
             lenght = _lenght;
             height = _height;
         }//czy my w ogóle musimy robić przeszkody naziemne o zmiennych rozmiarach? w specyfikacji projektu nic o tym nie ma 
+
+        public double Width { get => width; set => width = value; }
+        public double Lenght { get => lenght; set => lenght = value; }
+        public double Height { get => height; set => height = value; }
+        public Point Position { get => position; set => position = value; }
 
         public Vehicle detectCollisions(Map _map) { return new Vehicle(); /*pusty return żeby kod się kompilował, zmienić jak projekt się rozrośnie*/ } //sprawdź czy program powinien wyrzucić zawiadomienie o możliwej kolizji między tym Obstacle a jakimś pojazdem, jeżeli tak to zwróć jego Obiekt, jeżeli nie to pewnie zwróć NULL czy coś
     }
@@ -103,10 +111,10 @@ namespace projekt_PO
     public class Vehicle : Obstacle //Vehicle dziedziczy z obstacle
     {
         //Position odziedziczone z obstacle
-        protected float speed, height; //stała prędkość poruszania się samolotu oraz wysokosc na ktorej aktualnie się znajduje
-        Segment route; //trasa samolotu zaczynająca się na (xstart, ystart) a kończąca sie (xend, yend) - patrz konstruktor
+        protected double speed, height; //stała prędkość poruszania się samolotu oraz wysokosc na ktorej aktualnie się znajduje
+        public Segment route; //trasa samolotu zaczynająca się na (xstart, ystart) a kończąca sie (xend, yend) - patrz konstruktor
 
-        public void changeRoute(float _xend, float _yend, float _height) //zmien trase lotu pojazdu. poczatkowa pozycja to ta na ktorej aktualnie znajduje sie samolot w aktualnej klatce, a argumenty opisywanej właśnie funkcji to nowy cel. heightnew to nowy pułap na którym leci pojazd
+        public void changeRoute(double _xend, double _yend, double _height) //zmien trase lotu pojazdu. poczatkowa pozycja to ta na ktorej aktualnie znajduje sie samolot w aktualnej klatce, a argumenty opisywanej właśnie funkcji to nowy cel. heightnew to nowy pułap na którym leci pojazd
         {
             route.end = new Point(_xend, _yend);
             height = _height;
@@ -156,17 +164,19 @@ namespace projekt_PO
 
     public class Point
     {
-        public float x
+        private double x;
+        private double y;
+
+        public double X { get => x; set => x = value; }
+        public double Y { get => y; set => y = value; }
+
+        public Point(double _x, double _y) { x = _x; y = _y; }
+
+        public Point()
         {
-            get { return x; }
-            set { x = value; }
+            x = 0;
+            y = 0;
         }
-        public float y
-        {
-            get { return y; }
-            set { y = value; }
-        }
-        public Point(float _x, float _y) { x = _x; y = _y; }
 
     }
 
@@ -182,7 +192,7 @@ namespace projekt_PO
             get { return end; }
             set { end = value; }
         }
-        Segment(float xbegin, float ybegin, float xend, float yend) //professional constructor tyvm gg
+        Segment(double xbegin, double ybegin, double xend, double yend) //professional constructor tyvm gg
         {
             begin = new Point(xbegin, ybegin);
             end = new Point(xend, yend);
