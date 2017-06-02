@@ -10,31 +10,32 @@ using System.Threading.Tasks;
 namespace projekt_PO
 {
 
-    static class Constants //klasa zawierające wszystkie stałe używane w projekcie (wielkośc mapy, prędkości pojazdów)
+    public static class Constants //klasa zawierające wszystkie stałe używane w projekcie (wielkośc mapy, prędkości pojazdów)
     {
-        public const float mapSizeX = 1000;
+        public const float mapSizeX = 1000; //podpiąć do MainWindow.xaml
         public const float mapSizeY = 1000;
-        class Plane
+        public const float startingVehicleHeight = 1000;
+        public class Plane
         {
             public const float speed = 200;
         }
-        class Balloon
+        public class Balloon
         {
             public const float speed = 50;
         }
 
-        class Glider
+        public class Glider
         {
             public const float speed = 120;
         }
 
-        class Helicopter
+        public class Helicopter
         {
             public const float speed = 150;
         }
     }
 
-    class Generator /*chyba przydałoby się zrobić taka klase Generator w której sa wszystkie
+    public class Generator /*chyba przydałoby się zrobić taka klase Generator w której sa wszystkie
         metody np. generateRoute, generateVehicles, generateObstacles żeby nie robić gigantycznej metody generate() w klasie Map.
         Ogólnie to w samych zaleceniach projektu na cezie2 jest napisane żeby rozbijac wielkie metody na mniejsze.
         
@@ -45,7 +46,7 @@ namespace projekt_PO
 
     }
 
-    class Map //OBSTACLE NIE DZIEDZICZY Z MAP (w przeciwienstwie do tego co moze sugerowac UML)
+    public class Map //OBSTACLE NIE DZIEDZICZY Z MAP (w przeciwienstwie do tego co moze sugerowac UML)
     {
         private List<Vehicle> vehicles; //klasa Vehicle jest później w kodzie
         private List<Obstacle> obstacles;
@@ -59,30 +60,37 @@ namespace projekt_PO
             vehicles = new List<Vehicle>();
             obstacles = new List<Obstacle>();
         }
-        
+
 
         public void generate() { } //wygeneruj świat (samoloty i przeszkody)
-        public void addVehicle(Vehicle _vehicle) {
+        public void addVehicle(Vehicle _vehicle) {   //dodaj pojazd latajacy do mapy
+            vehicles.Add(_vehicle);
+            
             //przypomnienie: metoda ma dodać pojazd do listy vehicles
-        } //dodaj pojazd latajacy
-        public void nextFrame() { } //przeskocz do następnej klatki (przesuwa wszystkie samoloty do przodu o ich wartośc prędkości)
+        } 
+        public void nextFrame() {
+            foreach (Vehicle vehicle in vehicles)
+            {
+               // vehicle.position.
+            }
+        } //przeskocz do następnej klatki (przesuwa wszystkie samoloty do przodu o ich wartośc prędkości)
     }
 
-    class Obstacle //nie dziedziczy z Map, jest wolnostojącym objektem
+    public class Obstacle //nie dziedziczy z Map, jest wolnostojącym objektem
     {
-        protected float x, y; //pozycja x, y przeszkody
+        public Point position; //pozycja x, y przeszkody
         float width, lenght, height; //szerokosc długosc wysokośc przeszkody (Nie ma tego w UMLu a powinno być)
 
         public Obstacle()
         {
-            x = Constants.mapSizeX / 2;
-            y = Constants.mapSizeY / 2;
+            position.x = Constants.mapSizeX / 2;
+            position.y = Constants.mapSizeY / 2;
             width = lenght = height = 20;
         }
         public Obstacle(float _x, float _y, float _width, float _lenght, float _height)
         {
-            x = _x;
-            y = _y;
+            position.x = _x;
+            position.y = _y;
             width = _width;
             lenght = _lenght;
             height = _height;
@@ -92,33 +100,88 @@ namespace projekt_PO
     }
 
 
-    class Vehicle : Obstacle //Vehicle dziedziczy z obstacle
+    public class Vehicle : Obstacle //Vehicle dziedziczy z obstacle
     {
-        //x i y odziedziczone z obstacle
-        float speed, height; //stała prędkość poruszania się samolotu oraz wysokosc na ktorej aktualnie się znajduje
+        //Position odziedziczone z obstacle
+        protected float speed, height; //stała prędkość poruszania się samolotu oraz wysokosc na ktorej aktualnie się znajduje
         Segment route; //trasa samolotu zaczynająca się na (xstart, ystart) a kończąca sie (xend, yend) - patrz konstruktor
 
-        public Vehicle() {
-       
-        }
-
-        public void changeRoute(float xendnew, float yendnew, float heightnew) //zmien trase lotu pojazdu. poczatkowa pozycja to ta na ktorej aktualnie znajduje sie samolot w aktualnej klatce, a argumenty opisywanej właśnie funkcji to nowy cel. heightnew to nowy pułap na którym leci pojazd
+        public void changeRoute(float _xend, float _yend, float _height) //zmien trase lotu pojazdu. poczatkowa pozycja to ta na ktorej aktualnie znajduje sie samolot w aktualnej klatce, a argumenty opisywanej właśnie funkcji to nowy cel. heightnew to nowy pułap na którym leci pojazd
         {
+            route.end = new Point(_xend, _yend);
+            height = _height;
         }
 
-        //public Vehicle detectCollisions() odziedziczony z Obstacle (dla przypomnienia)
+        //metoda public Vehicle detectCollisions() odziedziczony z Obstacle tutaj (dla przypomnienia)
     }
 
-    class Point
+    //---------------------------------------RODZAJE POJAZDOW DZIEDZICZACE Z VEHICLE (BALON, HELIKOPTER ETC.)--------------------------------------
+
+    public class Helicopter : Vehicle
     {
-        float x, y;
+        Helicopter()
+        {
+            speed = Constants.Helicopter.speed;
+            height = Constants.startingVehicleHeight;
+        }
+    }
+
+    public class Glider : Vehicle
+    {
+        Glider()
+        {
+            speed = Constants.Glider.speed;
+            height = Constants.startingVehicleHeight;
+        }
+    }
+
+    public class Plane : Vehicle
+    {
+        Plane()
+        {
+            speed = Constants.Plane.speed;
+            height = Constants.startingVehicleHeight;
+        }
+    }
+
+    public class Balloon : Vehicle
+    {
+        Balloon()
+        {
+            speed = Constants.Balloon.speed;
+            height = Constants.startingVehicleHeight;
+        }
+    }
+
+
+    public class Point
+    {
+        public float x
+        {
+            get { return x; }
+            set { x = value; }
+        }
+        public float y
+        {
+            get { return y; }
+            set { y = value; }
+        }
         public Point(float _x, float _y) { x = _x; y = _y; }
-        
+
     }
 
-    class Segment //odcinek
+    public class Segment //odcinek
     {
-        Point begin, end;
+        public Point begin
+        {
+            get { return begin; }
+            set { begin = value; }
+        }
+        public Point end
+        {
+            get { return end; }
+            set { end = value; }
+        }
         Segment(float xbegin, float ybegin, float xend, float yend) //professional constructor tyvm gg
         {
             begin = new Point(xbegin, ybegin);
