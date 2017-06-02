@@ -1,5 +1,4 @@
-﻿using projekt_PO;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -76,7 +75,7 @@ namespace PO_wpf
 
             img.Source = new BitmapImage(new Uri(IMG));
 
-            img.Margin = new Thickness(vhc.position.X, 0, 0, vhc.position.Y);
+            img.Margin = new Thickness(vhc.Position.X, 0, 0, vhc.Position.Y);
             img.Height = 10;
             img.Width = 10;
             img.HorizontalAlignment = HorizontalAlignment.Left;
