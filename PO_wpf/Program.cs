@@ -143,8 +143,10 @@ namespace projekt_PO
 
     public class Helicopter : Vehicle
     {
-        Helicopter()
+        public Helicopter()
         {
+            Position.X = 0;
+            Position.Y = 0;
             Speed = Constants.Helicopter.speed;
             Height1 = Constants.startingVehicleHeight;
         }

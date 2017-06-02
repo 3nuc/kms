@@ -23,31 +23,44 @@ namespace PO_wpf
     public partial class MainWindow : Window
     {
         public const string IMG = "pack://application:,,,/img/placeholder.bmp";
+        public Random random = new Random();
         public MainWindow()
         {
             Obstacle obs = new Obstacle(20,20,10,10,200);
+            Helicopter heli = new Helicopter();
+
+            List<Image> list = new List<Image>();
 
             InitializeComponent();
 
             Image obsimg = AddObstacle(obs);
+            
+            list.Add(AddVehicle(heli));
+            list.Add(AddVehicle(heli));
+            list.Add(AddVehicle(heli));
+            list.Add(AddVehicle(heli));
+            list.Add(AddVehicle(heli));
 
-            ast(obsimg);
+            ast(list);
         }
 
-        private async void ast(Image img)           //metoda asynchroniczna
+        private async void ast(List<Image> list)           //metoda asynchroniczna
         {
-            await Task.Run(() => keepadding(img));
+            await Task.Run(() => keepadding(list));
         }
 
-        private void keepadding(Image img)
+        private void keepadding(List<Image> list)
         {
             while (true)
             {
                 this.Dispatcher.Invoke(() =>        //gdy inny wątek chce zmienić UI wątku głównego używamy tej instrukcji
                 {
-                    img.Margin = new Thickness(img.Margin.Left, 0, 0, img.Margin.Bottom + 5);
+                    foreach (Image img in list)
+                    {
+                        img.Margin = new Thickness(img.Margin.Left + random.Next(0,10), 0, 0, img.Margin.Bottom + random.Next(0,10));
+                    }
                 });
-                Task.Delay(1000).Wait();
+                Task.Delay(500).Wait();
             }
         }
 
@@ -76,10 +89,12 @@ namespace PO_wpf
             img.Source = new BitmapImage(new Uri(IMG));
 
             img.Margin = new Thickness(vhc.Position.X, 0, 0, vhc.Position.Y);
-            img.Height = 10;
-            img.Width = 10;
+            img.Height = 5;
+            img.Width = 5;
             img.HorizontalAlignment = HorizontalAlignment.Left;
             img.VerticalAlignment = VerticalAlignment.Bottom;
+
+            Map.Children.Add(img);
 
             return img;
         }
