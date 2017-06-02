@@ -88,7 +88,7 @@ namespace projekt_PO
             height = _height;
         }//czy my w ogóle musimy robić przeszkody naziemne o zmiennych rozmiarach? w specyfikacji projektu nic o tym nie ma 
 
-        public Vehicle detectCollisions(Map _map) { } //sprawdź czy program powinien wyrzucić zawiadomienie o możliwej kolizji między tym Obstacle a jakimś pojazdem, jeżeli tak to zwróć jego Obiekt, jeżeli nie to pewnie zwróć NULL czy coś
+        public Vehicle detectCollisions(Map _map) { return new Vehicle(); /*pusty return żeby kod się kompilował, zmienić jak projekt się rozrośnie*/ } //sprawdź czy program powinien wyrzucić zawiadomienie o możliwej kolizji między tym Obstacle a jakimś pojazdem, jeżeli tak to zwróć jego Obiekt, jeżeli nie to pewnie zwróć NULL czy coś
     }
 
 
@@ -98,7 +98,7 @@ namespace projekt_PO
         float speed, height; //stała prędkość poruszania się samolotu oraz wysokosc na ktorej aktualnie się znajduje
         Segment route; //trasa samolotu zaczynająca się na (xstart, ystart) a kończąca sie (xend, yend) - patrz konstruktor
 
-        Vehicle() {
+        public Vehicle() {
        
         }
 
