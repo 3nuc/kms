@@ -71,8 +71,8 @@ namespace projekt_PO
         public void nextFrame() {
             foreach (Vehicle vehicle in vehicles)
             {
-                double horizontalDisplacement = vehicle.route.end.X - vehicle.route.begin.X; //przesuniecie na x-ach
-                double verticalDisplacement = vehicle.route.end.Y - vehicle.route.begin.Y; //przesuniecie na y
+                double horizontalDisplacement = vehicle.Route.End.X - vehicle.Route.Begin.X; //przesuniecie na x-ach
+                double verticalDisplacement = vehicle.Route.End.Y - vehicle.Route.Begin.Y; //przesuniecie na y
                 double routeLenght = Math.Sqrt(horizontalDisplacement * horizontalDisplacement + verticalDisplacement * verticalDisplacement);
                 //finding angle
 
@@ -87,7 +87,7 @@ namespace projekt_PO
 
         public Obstacle() //debug constructor i guess
         {
-            Position = new Point(Position.X = Constants.mapSizeX / 2, Position.y = Constants.mapSizeY / 2);
+            Position = new Point(Position.X = Constants.mapSizeX / 2, Position.Y = Constants.mapSizeY / 2);
             width = lenght = height = 20;
         }
         public Obstacle(double _x, double _y, double _width, double _lenght, double _height)
@@ -112,11 +112,13 @@ namespace projekt_PO
     {
         //Position odziedziczone z obstacle
         protected double speed, height; //stała prędkość poruszania się samolotu oraz wysokosc na ktorej aktualnie się znajduje
-        public Segment route; //trasa samolotu zaczynająca się na (xstart, ystart) a kończąca sie (xend, yend) - patrz konstruktor
+        private Segment route; //trasa samolotu zaczynająca się na (xstart, ystart) a kończąca sie (xend, yend) - patrz konstruktor
+
+        public Segment Route { get => route; set => route = value; }
 
         public void changeRoute(double _xend, double _yend, double _height) //zmien trase lotu pojazdu. poczatkowa pozycja to ta na ktorej aktualnie znajduje sie samolot w aktualnej klatce, a argumenty opisywanej właśnie funkcji to nowy cel. heightnew to nowy pułap na którym leci pojazd
         {
-            route.end = new Point(_xend, _yend);
+            Route.End = new Point(_xend, _yend);
             height = _height;
         }
 
@@ -182,12 +184,15 @@ namespace projekt_PO
 
     public class Segment //odcinek
     {
-        public Point begin
+
+        private Point begin, end;
+
+        public Point Begin
         {
             get { return begin; }
             set { begin = value; }
         }
-        public Point end
+        public Point End
         {
             get { return end; }
             set { end = value; }
