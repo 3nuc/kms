@@ -132,12 +132,4 @@ namespace projekt_PO
         }
     }
 
-
-
-    class Program
-    {
-        static void Main(string[] args)
-        {
-        }
-    }
 }
