@@ -1,9 +1,20 @@
 ﻿using projekt_PO;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using projekt_PO;
 
 namespace PO_wpf
 {
@@ -47,10 +58,10 @@ namespace PO_wpf
 
             img.Source = new BitmapImage(new Uri(IMG));     //Uri do zdjęcia; Source ma typ ImageSource
 
-            img.RenderTransformOrigin = new System.Windows.Point(0, 0);         //dla obiektu statycznego x,y określa lewy górny róg
-            img.Margin = new Thickness(obs.position.X, 0, 0, obs.position.Y);
-            img.Height = obs.lenght;
-            img.Width = obs.width;
+            img.RenderTransformOrigin = new System.Windows.Point(0, 0);
+            img.Margin = new Thickness(obs.Position.X, obs.Position.Y, 0, 0);
+            img.Height = obs.Lenght;
+            img.Width = obs.Width;
             img.HorizontalAlignment = HorizontalAlignment.Left;
             img.VerticalAlignment = VerticalAlignment.Bottom;
 
