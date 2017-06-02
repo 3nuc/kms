@@ -68,10 +68,10 @@ namespace projekt_PO
         public void nextFrame() { } //przeskocz do następnej klatki (przesuwa wszystkie samoloty do przodu o ich wartośc prędkości)
     }
 
-    class Obstacle //nie dziedziczy z Map, jest wolnostojącym objektem
+    public class Obstacle //nie dziedziczy z Map, jest wolnostojącym objektem
     {
-        protected float x, y; //pozycja x, y przeszkody
-        float width, lenght, height; //szerokosc długosc wysokośc przeszkody (Nie ma tego w UMLu a powinno być)
+        public float x, y; //pozycja x, y przeszkody
+        public float width, lenght, height; //szerokosc długosc wysokośc przeszkody (Nie ma tego w UMLu a powinno być)
 
         public Obstacle()
         {
@@ -88,7 +88,7 @@ namespace projekt_PO
             height = _height;
         }//czy my w ogóle musimy robić przeszkody naziemne o zmiennych rozmiarach? w specyfikacji projektu nic o tym nie ma 
 
-        public Vehicle detectCollisions(Map _map) { return new Vehicle(); /*pusty return żeby kod się kompilował, zmienić jak projekt się rozrośnie*/ } //sprawdź czy program powinien wyrzucić zawiadomienie o możliwej kolizji między tym Obstacle a jakimś pojazdem, jeżeli tak to zwróć jego Obiekt, jeżeli nie to pewnie zwróć NULL czy coś
+        //public Vehicle detectCollisions(Map _map) { return new Vehicle(); /*pusty return żeby kod się kompilował, zmienić jak projekt się rozrośnie*/ } //sprawdź czy program powinien wyrzucić zawiadomienie o możliwej kolizji między tym Obstacle a jakimś pojazdem, jeżeli tak to zwróć jego Obiekt, jeżeli nie to pewnie zwróć NULL czy coś
     }
 
 
