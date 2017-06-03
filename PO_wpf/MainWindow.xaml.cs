@@ -40,40 +40,43 @@ namespace PO_wpf
             heli.Route.Begin = new projekt_PO.Point(0, 0);
             heli.Route.End = new projekt_PO.Point(500, 500);
 
-            map.vehicles.Add(heli);
+            map.Vehicles.Add(heli);
 
             heli2.Position = new projekt_PO.Point(100, 100);
             heli2.Route.Begin = new projekt_PO.Point(100, 100);
             heli2.Route.End = new projekt_PO.Point(500, 500);
 
-            map.vehicles.Add(heli2);
+            map.Vehicles.Add(heli2);
 
             heli3.Position = new projekt_PO.Point(200, 0);
             heli3.Route.Begin = new projekt_PO.Point(200, 0);
             heli3.Route.End = new projekt_PO.Point(500, 500);
 
-            map.vehicles.Add(heli3);
+            map.Vehicles.Add(heli3);
 
             heli4.Position = new projekt_PO.Point(150, 450);
             heli4.Route.Begin = new projekt_PO.Point(150, 450);
             heli4.Route.End = new projekt_PO.Point(500, 500);
 
-            map.vehicles.Add(heli4);
+            map.Vehicles.Add(heli4);
             //map.vehicles.Add(heli);
             //map.vehicles.Add(heli);
             //map.vehicles.Add(heli);
 
             InitializeComponent();
 
+            Width = Constants.mapSizeY+300;             //
+            Height = Constants.mapSizeX+100;            //rozmiar okna
+            MapBorder.Width = Constants.mapSizeY;       //i mapy
+            MapBorder.Height = Constants.mapSizeX;      //
+
             Image obsimg = AddObstacle(obs);
 
-            foreach (Vehicle v in map.vehicles)
+            foreach (Vehicle v in map.Vehicles)
             {
                 VehicleObject obj = new VehicleObject(v, AddVehicle(v));
                 vehicleobjectlist.Add(obj);
             }
-
-
 
             ast(map, vehicleobjectlist);
         }
@@ -137,7 +140,7 @@ namespace PO_wpf
         
     }
 
-    public class VehicleObject
+    public class VehicleObject      //każdy pojazd ma swój odpowiednik na mapie
     {
         private Image img;
         private Vehicle vhc;

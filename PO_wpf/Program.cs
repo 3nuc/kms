@@ -9,11 +9,10 @@ using System.Threading.Tasks;
 
 namespace projekt_PO
 {
-
     public static class Constants //klasa zawierające wszystkie stałe używane w projekcie (wielkośc mapy, prędkości pojazdów)
     {
-        public const double mapSizeX = 1000; //TODO: @Michał (low priority task) weź jakoś zrób żeby rozmiar tego <Border>a w MainWindow.xaml był zależny od właśnie tych dwóch zmiennych przy tym komentarzu
-        public const double mapSizeY = 1000; 
+        public const double mapSizeX = 500;
+        public const double mapSizeY = 500; 
         public const double startingVehicleHeight = 1000;
         public class Plane
         {
@@ -29,11 +28,11 @@ namespace projekt_PO
             public const double speed = 120;
         }
 
-            public class Helicopter
-            {
-                public const double speed = 25;
-            }
+        public class Helicopter
+        {
+            public const double speed = 25;
         }
+    }
 
     public class Generator /*chyba przydałoby się zrobić taka klase Generator w której sa wszystkie
         metody np. generateRoute, generateVehicles, generateObstacles żeby nie robić gigantycznej metody generate() w klasie Map.
