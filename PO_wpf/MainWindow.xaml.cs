@@ -72,7 +72,7 @@ namespace PO_wpf
 
             img.RenderTransformOrigin = new System.Windows.Point(0, 0);
             img.Margin = new Thickness(obs.Position.X, obs.Position.Y, 0, 0);
-            img.Height = obs.Lenght;
+            img.Height = obs.Length;
             img.Width = obs.Width;
             img.HorizontalAlignment = HorizontalAlignment.Left;
             img.VerticalAlignment = VerticalAlignment.Bottom;
