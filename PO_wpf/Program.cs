@@ -31,7 +31,7 @@ namespace projekt_PO
 
             public class Helicopter
             {
-                public const double speed = 150;
+                public const double speed = 25;
             }
         }
 
@@ -48,8 +48,8 @@ namespace projekt_PO
 
         public class Map //OBSTACLE NIE DZIEDZICZY Z MAP (w przeciwienstwie do tego co moze sugerowac UML)
         {
-            private List<Vehicle> vehicles; //klasa Vehicle jest później w kodzie
-            private List<Obstacle> obstacles;
+            public List<Vehicle> vehicles; //klasa Vehicle jest później w kodzie
+            public List<Obstacle> obstacles;
             private double mapSizeX, mapSizeY; //rozmiar mapy
 
             public Map()
