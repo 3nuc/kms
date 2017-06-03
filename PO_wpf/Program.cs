@@ -49,6 +49,7 @@ namespace projekt_PO
     {
         private List<Vehicle> vehicles; //klasa Vehicle jest później w kodzie
         private List<Obstacle> obstacles;
+
         private double mapSizeX, mapSizeY; //rozmiar mapy
 
         public Map()
@@ -133,8 +134,32 @@ namespace projekt_PO
         public double Height { get => height; set => height = value; }
         public Point Position { get => position; set => position = value; }
 
-        public Vehicle detectCollisions(Map _map) { return new Vehicle(); /*pusty return żeby kod się kompilował, zmienić jak projekt się rozrośnie*/ } //sprawdź czy program powinien wyrzucić zawiadomienie o możliwej kolizji między tym Obstacle a jakimś pojazdem, jeżeli tak to zwróć jego Obiekt, jeżeli nie to pewnie zwróć NULL czy coś
-    }
+        virtual public List<Obstacle> detectCollisions(Map _map)
+        {
+            List<Obstacle> collisions = new List<Obstacle>();
+            Segment obstacleBottom = new Segment(position, new Point(position.X + width, position.Y));
+            Segment obstacleTop = new Segment(new Point(position.X, position.Y + length), new Point(position.X + width, position.Y + length));
+            Segment obstacleLeft = new Segment(position, new Point(position.X, position.Y + length));
+            Segment obstacleRight = new Segment(new Point(position.X + width, position.Y), new Point(position.X + width, position.Y));
+
+            foreach (Vehicle vehicle in _map.Vehicles) //każdy Obstacle sprawdza czy żaden Vehicle się z nim nie zderzy
+            {
+                if (vehicle.getGhostRoute().checkIntersection(obstacleBottom) || //jeżeli samolot chce przelecieć przez jakikolwiek z boków przeszkody
+                   vehicle.getGhostRoute().checkIntersection(obstacleTop) ||
+                   vehicle.getGhostRoute().checkIntersection(obstacleLeft) ||
+                   vehicle.getGhostRoute().checkIntersection(obstacleBottom))
+                {
+                    collisions.Add(vehicle);
+                }
+
+            }
+
+            return collisions;
+        }
+
+
+    } //sprawdź czy program powinien wyrzucić zawiadomienie o możliwej kolizji między tym Obstacle a jakimś pojazdem, jeżeli tak to zwróć jego Obiekt, jeżeli nie to pewnie zwróć NULL czy coś
+
 
 
     public class Vehicle : Obstacle //Vehicle dziedziczy z obstacle
@@ -163,8 +188,40 @@ namespace projekt_PO
             ReachedDestination = false; //na wypadek jeżeli zmieniamy trasę samolotu który dotarł do celu i na nim stoi (logika poruszania jest wyłączona dla samolotów które dotarły do celu)
         }
 
+        public Segment getGhostRoute()
+        {
+            double speed = Speed;
+            double horizontalDisplacement = Route.End.X - Route.Begin.X;
+            double verticalDisplacement = Route.End.Y - Route.Begin.Y;
+            double routeLength = Route.getLength();
+
+            double displaceByY = (verticalDisplacement / routeLength) * speed;
+            double displaceByX = (horizontalDisplacement / routeLength) * speed;
+
+
+            Segment distanceTraveledPlusDisplaceBy = new Segment(Position, new Point(Position.X + displaceByX, Position.Y + displaceByY));
+            return distanceTraveledPlusDisplaceBy;
+        }
         //metoda public Vehicle detectCollisions() odziedziczony z Obstacle tutaj (dla przypomnienia)
+
+        public override List<Obstacle> detectCollisions(Map _map)
+        {
+            List<Obstacle> collisions = new List<Obstacle>();
+
+            foreach (Vehicle vehicle in _map.Vehicles) //każdy Vehicle sprawdza czy żaden Vehicle się z nim nie zderzy
+            {
+                if (vehicle == this) break;
+                if (vehicle.getGhostRoute().checkIntersection(this.getGhostRoute()))
+                {
+                    collisions.Add(vehicle);
+                }
+
+            }
+
+            return collisions;
+        }
     }
+
 
     //---------------------------------------RODZAJE POJAZDOW DZIEDZICZACE Z VEHICLE (BALON, HELIKOPTER ETC.)--------------------------------------
 
@@ -258,18 +315,61 @@ namespace projekt_PO
             end = _end;
         }
 
-        public double getLength()
-        {
-            return begin.lengthFrom(end);
-        }
-
-
         public Segment()
         {
             begin = new Point(0, 0);
             end = new Point(300, 300);
         }
+
+        public double getLength()
+        {
+            return begin.lengthFrom(end);
+        }
+
+        public bool checkIntersection(Segment segment)
+        {
+            double crossProductBegin = (segment.End.X - segment.Begin.X) * (Begin.Y - segment.End.Y) - (segment.End.Y - segment.Begin.Y) * (Begin.X - segment.End.X);
+            double crossProductEnd = (segment.End.X - segment.Begin.X) * (End.Y - segment.End.Y) - (segment.End.Y - segment.Begin.Y) * (End.X - segment.End.X);
+
+            double intersectionTestResult = Math.Sign(crossProductBegin) * Math.Sign(crossProductEnd);
+
+            if (intersectionTestResult >= 0) return false;
+            else return true;
+        }
+
     }
+
+    //class Program
+    //{
+    //    static void Main(string[] args)
+    //    {
+    //        Map map = new Map();
+    //        Plane a = new Plane();
+    //        Plane b = new Plane();
+
+    //        a.Position = new Point(0, 0);
+    //        a.Route.Begin = new Point(0, 0);
+    //        a.Route.End = new Point(400, 400);
+
+    //        map.addVehicle(a);
+
+    //        b.Position = new Point(400, 0);
+    //        b.Route.Begin = new Point(400, 0);
+    //        b.Route.End = new Point(0, 400);
+
+    //        map.addVehicle(b);
+    //        map.nextFrame();
+
+    //        Console.WriteLine(a.Route.checkIntersection(b.Route));
+    //        Console.WriteLine(a.getGhostRoute().checkIntersection(b.getGhostRoute()));
+    //        foreach (Obstacle vehicle in b.detectCollisions(map))
+    //        {
+    //            Console.WriteLine(vehicle.Position.X + " " + vehicle.Position.Y);
+    //        }
+
+    //    }
+    //}
+
 
     //class Program
     //{
