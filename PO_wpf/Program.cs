@@ -11,8 +11,8 @@ namespace projekt_PO
 {
     public static class Constants //klasa zawierające wszystkie stałe używane w projekcie (wielkośc mapy, prędkości pojazdów)
     {
-        public const double mapSizeX = 500;
-        public const double mapSizeY = 500; 
+        public const double mapSizeX = 1000; //podpiąć do MainWindow.xaml
+        public const double mapSizeY = 1000;
         public const double startingVehicleHeight = 1000;
         public class Plane
         {
@@ -30,7 +30,7 @@ namespace projekt_PO
 
         public class Helicopter
         {
-            public const double speed = 25;
+            public const double speed = 150;
         }
     }
 
@@ -45,11 +45,11 @@ namespace projekt_PO
 
     }
 
-        public class Map //OBSTACLE NIE DZIEDZICZY Z MAP (w przeciwienstwie do tego co moze sugerowac UML)
-        {
-            private List<Vehicle> vehicles; //klasa Vehicle jest później w kodzie
-            private List<Obstacle> obstacles;
-            private double mapSizeX, mapSizeY; //rozmiar mapy
+    public class Map //OBSTACLE NIE DZIEDZICZY Z MAP (w przeciwienstwie do tego co moze sugerowac UML)
+    {
+        private List<Vehicle> vehicles; //klasa Vehicle jest później w kodzie
+        private List<Obstacle> obstacles;
+        private double mapSizeX, mapSizeY; //rozmiar mapy
 
         public Map()
         {
@@ -60,8 +60,10 @@ namespace projekt_PO
             obstacles = new List<Obstacle>();
         }
 
+
         public List<Vehicle> Vehicles { get => vehicles; } //klasa Vehicle jest później w kodzie
         public List<Obstacle> Obstacles { get => obstacles; }
+
         public void generate() { } //wygeneruj świat (samoloty i przeszkody)
         public void addVehicle(Vehicle _vehicle)
         {   //dodaj pojazd latajacy do mapy
@@ -79,8 +81,8 @@ namespace projekt_PO
                 double verticalDisplacement = vehicle.Route.End.Y - vehicle.Route.Begin.Y; //przesuniecie na y
                 double routeLength = vehicle.Route.getLength(); //długość trasy z tw. pitagorasa (długość odcinka zaczynającego się na Route.Begin i kończącego się na Route.End)
 
-                double displaceByY = (verticalDisplacement/routeLength) * speed * Math.Sign(verticalDisplacement); //wyznaczenie przesunięcia na x i y w jednej klatce
-                double displaceByX = (horizontalDisplacement/routeLength) * speed * Math.Sign(horizontalDisplacement);
+                double displaceByY = (verticalDisplacement / routeLength) * speed; //wyznaczenie przesunięcia na x i y w jednej klatce
+                double displaceByX = (horizontalDisplacement / routeLength) * speed;
 
                 // poniższa zmienna odpowiada na pytanie "jaki jest dystans między punktem początkowym trasy a pozycją samolotu PLUS przesunięcie o prędkość". Samolot nie jest jeszcze przesunięty!!!
                 double distanceTraveledPlusDisplaceBy = new Segment(vehicle.Route.Begin, new Point(vehicle.Position.X + displaceByX, vehicle.Position.Y + displaceByY)).getLength();
@@ -109,7 +111,7 @@ namespace projekt_PO
     public class Obstacle //nie dziedziczy z Map, jest wolnostojącym obiektem
     {
         Point position = new Point(); //pozycja x, y przeszkody
-        double width, length, height; //szerokosc długosc wysokośc przeszkody (Nie ma tego w UMLu a powinno być) WZGLĘDEM LEWEGO DOLNEGO ROGU
+        double width, length, height; //szerokosc długosc wysokośc przeszkody (Nie ma tego w UMLu a powinno być) WZGLĘDEM LEWEGO GORNEGO ROGU
 
         public Obstacle() //konstruktor do debugu
         {
@@ -139,7 +141,7 @@ namespace projekt_PO
     {
         //Position odziedziczone z obstacle
         private double height; //stała prędkość poruszania się samolotu oraz wysokosc na ktorej aktualnie się znajduje
-        private Segment route;//trasa samolotu zaczynająca się na (xstart, ystart) a kończąca sie (xend, yend) - patrz konstruktory klasy Segment
+        private Segment route;//trasa samolotu zaczynająca się na (xstart, ystart) a kończąca sie (xend, yend) - patrz konstruktor
         private double speed;
         private bool reachedDestination;
 
@@ -265,8 +267,34 @@ namespace projekt_PO
         public Segment()
         {
             begin = new Point(0, 0);
-            end = new Point(Constants.mapSizeX, Constants.mapSizeY);
+            end = new Point(300, 300);
         }
     }
 
+    //class Program
+    //{
+    //    static void Main(string[] args)
+    //    {
+    //        Map map = new Map();
+    //        Helicopter ehh = new Helicopter();
+
+    //        ehh.Position = new Point(150, 450);
+    //        ehh.Route.Begin = new Point(150, 450);
+    //        ehh.Route.End = new Point(400, 400);
+
+    //        map.addVehicle(ehh);
+
+    //        Console.WriteLine("X: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+    //        map.nextFrame();
+    //        Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+    //        map.nextFrame();
+    //        Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+    //        map.nextFrame();
+    //        map.nextFrame();
+    //        map.nextFrame();
+    //        map.nextFrame();
+    //        map.nextFrame();
+    //        Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+    //    }
+    //}
 }
