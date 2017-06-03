@@ -29,11 +29,11 @@ namespace projekt_PO
             public const double speed = 120;
         }
 
-        public class Helicopter
-        {
-            public const double speed = 150;
+            public class Helicopter
+            {
+                public const double speed = 25;
+            }
         }
-    }
 
     public class Generator /*chyba przydałoby się zrobić taka klase Generator w której sa wszystkie
         metody np. generateRoute, generateVehicles, generateObstacles żeby nie robić gigantycznej metody generate() w klasie Map.
@@ -46,11 +46,11 @@ namespace projekt_PO
 
     }
 
-    public class Map //OBSTACLE NIE DZIEDZICZY Z MAP (w przeciwienstwie do tego co moze sugerowac UML)
-    {
-        private List<Vehicle> vehicles; //klasa Vehicle jest później w kodzie
-        private List<Obstacle> obstacles;
-        private double mapSizeX, mapSizeY; //rozmiar mapy
+        public class Map //OBSTACLE NIE DZIEDZICZY Z MAP (w przeciwienstwie do tego co moze sugerowac UML)
+        {
+            public List<Vehicle> vehicles; //klasa Vehicle jest później w kodzie
+            public List<Obstacle> obstacles;
+            private double mapSizeX, mapSizeY; //rozmiar mapy
 
         public Map()
         {

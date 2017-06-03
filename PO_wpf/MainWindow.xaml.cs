@@ -26,41 +26,76 @@ namespace PO_wpf
         public Random random = new Random();
         public MainWindow()
         {
+            Map map = new Map();
             Obstacle obs = new Obstacle(20,20,10,10,200);
             Helicopter heli = new Helicopter();
+            Helicopter heli2 = new Helicopter();
+            Helicopter heli3 = new Helicopter();
+            Helicopter heli4 = new Helicopter();
 
-            List<Image> list = new List<Image>();
+            //List<Vehicle> vehiclelist = new List<Vehicle>();
+            List<VehicleObject> vehicleobjectlist = new List<VehicleObject>();
+
+            heli.Position = new projekt_PO.Point(0, 0);
+            heli.Route.Begin = new projekt_PO.Point(0, 0);
+            heli.Route.End = new projekt_PO.Point(500, 500);
+
+            map.vehicles.Add(heli);
+
+            heli2.Position = new projekt_PO.Point(100, 100);
+            heli2.Route.Begin = new projekt_PO.Point(100, 100);
+            heli2.Route.End = new projekt_PO.Point(500, 500);
+
+            map.vehicles.Add(heli2);
+
+            heli3.Position = new projekt_PO.Point(200, 0);
+            heli3.Route.Begin = new projekt_PO.Point(200, 0);
+            heli3.Route.End = new projekt_PO.Point(500, 500);
+
+            map.vehicles.Add(heli3);
+
+            heli4.Position = new projekt_PO.Point(150, 450);
+            heli4.Route.Begin = new projekt_PO.Point(150, 450);
+            heli4.Route.End = new projekt_PO.Point(500, 500);
+
+            map.vehicles.Add(heli4);
+            //map.vehicles.Add(heli);
+            //map.vehicles.Add(heli);
+            //map.vehicles.Add(heli);
 
             InitializeComponent();
 
             Image obsimg = AddObstacle(obs);
-            
-            list.Add(AddVehicle(heli));
-            list.Add(AddVehicle(heli));
-            list.Add(AddVehicle(heli));
-            list.Add(AddVehicle(heli));
-            list.Add(AddVehicle(heli));
 
-            ast(list);
+            foreach (Vehicle v in map.vehicles)
+            {
+                VehicleObject obj = new VehicleObject(v, AddVehicle(v));
+                vehicleobjectlist.Add(obj);
+            }
+
+
+
+            ast(map, vehicleobjectlist);
         }
 
-        private async void ast(List<Image> list)           //metoda asynchroniczna
+        private async void ast(Map map, List<VehicleObject> list)           //metoda asynchroniczna
         {
-            await Task.Run(() => keepadding(list));
+            await Task.Run(() => keepadding(map, list));
         }
 
-        private void keepadding(List<Image> list)
+        private void keepadding(Map map, List<VehicleObject> list)
         {
             while (true)
             {
+                map.nextFrame();
                 this.Dispatcher.Invoke(() =>        //gdy inny wątek chce zmienić UI wątku głównego używamy tej instrukcji
                 {
-                    foreach (Image img in list)
+                    foreach (VehicleObject obj in list)
                     {
-                        img.Margin = new Thickness(img.Margin.Left + random.Next(0,10), 0, 0, img.Margin.Bottom + random.Next(0,10));
+                        obj.Img.Margin = new Thickness(obj.Vhc.Position.X, 0, 0, obj.Vhc.Position.Y);
                     }
                 });
-                Task.Delay(500).Wait();
+                Task.Delay(1000).Wait();
             }
         }
 
@@ -77,7 +112,7 @@ namespace PO_wpf
             img.HorizontalAlignment = HorizontalAlignment.Left;
             img.VerticalAlignment = VerticalAlignment.Bottom;
 
-            Map.Children.Add(img);
+            MapCanvas.Children.Add(img);
 
             return img;
         }
@@ -94,9 +129,25 @@ namespace PO_wpf
             img.HorizontalAlignment = HorizontalAlignment.Left;
             img.VerticalAlignment = VerticalAlignment.Bottom;
 
-            Map.Children.Add(img);
+            MapCanvas.Children.Add(img);
 
             return img;
+        }
+
+        
+    }
+
+    public class VehicleObject
+    {
+        private Image img;
+        private Vehicle vhc;
+        public Image Img { get { return img; } private set { img = value; } }
+        public Vehicle Vhc { get { return vhc; } private set { vhc = value; } }
+
+        public VehicleObject(Vehicle _vhc, Image _img)
+        {
+            vhc = _vhc;
+            img = _img;
         }
     }
 }
