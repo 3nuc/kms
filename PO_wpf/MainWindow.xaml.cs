@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using projekt_PO;
+using System.ComponentModel;
 
 namespace PO_wpf
 {
@@ -38,25 +39,25 @@ namespace PO_wpf
 
             heli.Position = new projekt_PO.Point(0, 0);
             heli.Route.Begin = new projekt_PO.Point(0, 0);
-            heli.Route.End = new projekt_PO.Point(500, 500);
+            heli.Route.End = new projekt_PO.Point(400, 400);
 
             map.Vehicles.Add(heli);
 
             heli2.Position = new projekt_PO.Point(100, 100);
             heli2.Route.Begin = new projekt_PO.Point(100, 100);
-            heli2.Route.End = new projekt_PO.Point(500, 500);
+            heli2.Route.End = new projekt_PO.Point(400, 400);
 
             map.Vehicles.Add(heli2);
 
             heli3.Position = new projekt_PO.Point(200, 0);
             heli3.Route.Begin = new projekt_PO.Point(200, 0);
-            heli3.Route.End = new projekt_PO.Point(500, 500);
+            heli3.Route.End = new projekt_PO.Point(400, 400);
 
             map.Vehicles.Add(heli3);
 
             heli4.Position = new projekt_PO.Point(150, 450);
             heli4.Route.Begin = new projekt_PO.Point(150, 450);
-            heli4.Route.End = new projekt_PO.Point(500, 500);
+            heli4.Route.End = new projekt_PO.Point(400, 400);
 
             map.Vehicles.Add(heli4);
             //map.vehicles.Add(heli);
@@ -78,6 +79,8 @@ namespace PO_wpf
                 vehicleobjectlist.Add(obj);
             }
 
+            VehicleList.ItemsSource = vehicleobjectlist;
+
             ast(map, vehicleobjectlist);
         }
 
@@ -91,8 +94,11 @@ namespace PO_wpf
             while (true)
             {
                 map.nextFrame();
+                //BindingOperations.GetBindingExpressionBase(VehicleList, ListView.ItemsSourceProperty).UpdateTarget();
                 this.Dispatcher.Invoke(() =>        //gdy inny wątek chce zmienić UI wątku głównego używamy tej instrukcji
                 {
+                    VehicleList.ItemsSource = null;         //Update Binding
+                    VehicleList.ItemsSource = list;         //Refreshes Values
                     foreach (VehicleObject obj in list)
                     {
                         obj.Img.Margin = new Thickness(obj.Vhc.Position.X, 0, 0, obj.Vhc.Position.Y);
@@ -140,12 +146,37 @@ namespace PO_wpf
         
     }
 
-    public class VehicleObject      //każdy pojazd ma swój odpowiednik na mapie
+    public class VehicleObject : INotifyPropertyChanged   //każdy pojazd ma swój odpowiednik na mapie
     {
         private Image img;
         private Vehicle vhc;
-        public Image Img { get { return img; } private set { img = value; } }
-        public Vehicle Vhc { get { return vhc; } private set { vhc = value; } }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public Image Img
+        {
+            get { return img; }
+            private set
+            {
+                if(img != value)
+                {
+                    img = value;
+                    PropertyChanged(this, new PropertyChangedEventArgs("Img"));
+                }
+            }
+        }
+        public Vehicle Vhc
+        {
+            get { return vhc; }
+            private set
+            {
+                if (vhc != value)
+                {
+                    vhc = value;
+                    PropertyChanged(this, new PropertyChangedEventArgs("Vhc"));
+                }
+            }
+        }
 
         public VehicleObject(Vehicle _vhc, Image _img)
         {
