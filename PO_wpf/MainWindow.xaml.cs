@@ -65,8 +65,10 @@ namespace PO_wpf
 
             Width = Constants.mapSizeY+300;             //
             Height = Constants.mapSizeX+100;            //rozmiar okna
-            MapBorder.Width = Constants.mapSizeY;       //i mapy
-            MapBorder.Height = Constants.mapSizeX;      //
+            MapBorder.Width = Constants.mapSizeY + 4;       //i mapy
+            MapBorder.Height = Constants.mapSizeX + 4;      //
+            MapCanvas.Width = Constants.mapSizeY;       
+            MapCanvas.Height = Constants.mapSizeX;
 
             Image obsimg = AddObstacle(obs);
 
@@ -90,6 +92,7 @@ namespace PO_wpf
         {
             while (true)
             {
+                Task.Delay(1000).Wait();
                 map.nextFrame();
                 //BindingOperations.GetBindingExpressionBase(VehicleList, ListView.ItemsSourceProperty).UpdateTarget();
                 this.Dispatcher.Invoke(() =>        //gdy inny wątek chce zmienić UI wątku głównego używamy tej instrukcji
@@ -98,10 +101,11 @@ namespace PO_wpf
                     VehicleList.ItemsSource = list;         //Refreshes Values
                     foreach (VehicleObject obj in list)
                     {
-                        obj.Img.Margin = new Thickness(obj.Vhc.Position.X, 0, 0, obj.Vhc.Position.Y);
+                        //obj.Img.Margin = new Thickness(obj.Vhc.Position.X, 0, 0, obj.Vhc.Position.Y);
+                        Canvas.SetBottom(obj.Img, obj.Vhc.Position.Y - (obj.Img.Height)/2);
+                        Canvas.SetLeft(obj.Img, obj.Vhc.Position.X - (obj.Img.Width)/2);
                     }
                 });
-                Task.Delay(1000).Wait();
             }
         }
 
@@ -129,13 +133,17 @@ namespace PO_wpf
 
             img.Source = new BitmapImage(new Uri(IMG));
 
-            img.Margin = new Thickness(vhc.Position.X, 0, 0, vhc.Position.Y);
+            //img.RenderTransformOrigin = new System.Windows.Point(0.5,0.5);
+            //img.Margin = new Thickness(vhc.Position.X, 0, 0, vhc.Position.Y);
             img.Height = 5;
             img.Width = 5;
-            img.HorizontalAlignment = HorizontalAlignment.Left;
-            img.VerticalAlignment = VerticalAlignment.Bottom;
+            //img.HorizontalAlignment = HorizontalAlignment.Left;
+            //img.VerticalAlignment = VerticalAlignment.Bottom;
 
             MapCanvas.Children.Add(img);
+
+            Canvas.SetBottom(img, vhc.Position.Y - (img.Height)/2);
+            Canvas.SetLeft(img, vhc.Position.X - (img.Width)/2);
 
             return img;
         }
@@ -144,7 +152,7 @@ namespace PO_wpf
         {
             Line line = new Line();
 
-            //line.Margin = new Thickness(vhc.Position.X, 0, 0, vhc.Position.Y);
+            line.Margin = new Thickness(0, 0, 0, 0);
             //line.HorizontalAlignment = HorizontalAlignment.Left;
             //line.VerticalAlignment = VerticalAlignment.Bottom;
             line.StrokeThickness = 1;

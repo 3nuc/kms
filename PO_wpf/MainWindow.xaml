@@ -24,11 +24,11 @@
                 </ListView.View>
             </ListView>
         </Grid>
-        <Border Name ="MapBorder" BorderBrush="Black" BorderThickness="2" HorizontalAlignment="Right" Height="500" VerticalAlignment="Top" Width="500" Margin="0,10,10,0">
-            <Grid Name="MapCanvas">
+        <Border Name ="MapBorder" BorderBrush="Black" BorderThickness="2" HorizontalAlignment="Right" Height="504" VerticalAlignment="Top" Width="504" Margin="0,8,8,0">
+            <Canvas Name="MapCanvas" HorizontalAlignment="Right" Height="500" VerticalAlignment="Top" Width="500" Margin="0,0,0,0">
                 <!-- <Line HorizontalAlignment="Left" VerticalAlignment="Bottom" Name="line7" Stroke="Black" StrokeThickness="2" X1="10" X2="40" Y1="30" Y2="70"/> -->
-                <Image HorizontalAlignment="Left" Height="10" VerticalAlignment="Bottom" Width="10" x:Name="img1" Source="pack://application:,,,/img/placeholder.bmp" Margin="68,0,0,23" RenderTransformOrigin="0.033,0.067"/>
-            </Grid>
+                <Image Height="10" Canvas.Left="50" Canvas.Top="50" Width="10" x:Name="img1" Source="pack://application:,,,/img/placeholder.bmp" RenderTransformOrigin="0.033,0.067"/>
+            </Canvas>
         </Border>
     </Grid>
 </Window>
