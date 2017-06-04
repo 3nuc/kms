@@ -64,6 +64,8 @@ namespace PO_wpf
 
             map.addVehicle(b);
 
+            map.loadObstaclesFromFile(@"D:\\dev16k\\kms\\PO_wpf\\obst.txt"); //zmień se path
+
             InitializeComponent();
 
             Width = Constants.mapSizeY+500;             //

@@ -122,7 +122,7 @@ namespace projekt_PO
 
             for (int i = 1; i < routeLengthInSegments; i++)
             {
-                if(generatedRoutes[i-1].End != generatedRoutes[i].Begin)
+                if (generatedRoutes[i - 1].End != generatedRoutes[i].Begin)
                 {
                     Console.WriteLine("YOU DUN GOOFED");
                     Console.WriteLine(vehicle.Position.X + " " + vehicle.Position.Y);
@@ -165,26 +165,34 @@ namespace projekt_PO
             }
             return generatedVehicles;
         }
+
+
+        public List<Obstacle> generateObstacles(int numberOfObstacles)
+        {
+
+            List<Obstacle> generatedObstacles = new List<Obstacle>();
+            Obstacle generatedObstacle = new Obstacle();
+            Random numberGenerator = new Random(Guid.NewGuid().GetHashCode());
+
+            Point generatePoint()
+            {
+                Point generatedPoint = new Point(numberGenerator.Next() % Constants.mapSizeX, numberGenerator.Next() % Constants.mapSizeY);
+                return generatedPoint;
+            }
+
+            generatedObstacle.Position = generatePoint();
+
+            for (int i = 0; i < numberOfObstacles; i++)
+            {
+                Obstacle currentlyAdded = new Obstacle(numberGenerator.Next(1, Convert.ToInt32(Constants.mapSizeX)), numberGenerator.Next(1, Convert.ToInt32(Constants.mapSizeY)), numberGenerator.Next(1, 50), numberGenerator.Next(1, 50), numberGenerator.Next(1, 50));
+                generatedObstacles.Add(currentlyAdded);
+            }
+
+            return generatedObstacles;
+        }
+
     }
 
-    //    public List<Obstacle> generateObstacles(int numberOfObstacles) {
-
-    //        List<Obstacle> generatedObstacles = new List<Obstacle>();
-    //        Obstacle generatedObstacle = new Obstacle();
-    //        Random numberGenerator = new Random(Guid.NewGuid().GetHashCode());
-
-    //        Point generatePoint()
-    //        {
-    //            Point generatedPoint = new Point(numberGenerator.Next() % Constants.mapSizeX, numberGenerator.Next() % Constants.mapSizeY);
-    //            return generatedPoint;
-    //        }
-
-    //        generatedObstacle.Position = generatePoint();
-
-    //        return new List<Obstacle>(); }
-
-
-    //}
 
     public class Map //OBSTACLE NIE DZIEDZICZY Z MAP (w przeciwienstwie do tego co moze sugerowac UML)
     {
@@ -192,6 +200,7 @@ namespace projekt_PO
         private List<Obstacle> obstacles; //lista przeszkód na mapie
         private List<Collision> collisions; //lista kolizji na mapie (zmienia się w trakcie wykonywania programu)
         private List<Collision> proximities; //lista zbliżeń na mapie
+        private bool isPreFirstFrame = true;
 
         private double mapSizeX, mapSizeY; //rozmiar mapy
 
@@ -232,10 +241,10 @@ namespace projekt_PO
             foreach (String item in data)
             {
                 String[] line = item.Split(null); //rozdzielaj po spacji
-                Obstacle currentlyAdded = new Obstacle(Convert.ToInt32(line[0]), Convert.ToInt32(line[1]), Convert.ToInt32(line[2]), Convert.ToInt32(line[3]), Convert.ToInt32(line[4]));
+                Obstacle currentlyAdded = new Obstacle(Int32.Parse(line[0]), Int32.Parse(line[1]), Int32.Parse(line[2]), Int32.Parse(line[3]), Int32.Parse(line[4]));
+                Console.WriteLine("ehh:" + Int32.Parse(line[0]));
+                Obstacles.Add(currentlyAdded);
             }
-
-            
             return true;
         }
 
@@ -422,9 +431,9 @@ namespace projekt_PO
 
             foreach (Vehicle vehicle in _map.Vehicles) //każdy Obstacle sprawdza czy żaden Vehicle się z nim nie zderzy
             {
-                if(vehicle == this) { continue; }
+                if (vehicle == this) { continue; }
 
-                 if (getVector3Length(Position.X, Position.Y, height, vehicle.Position.X, vehicle.Position.Y, vehicle.Routes[vehicle.CurrentSegmentIndex].Height) <= Constants.proximityWarningThreshold)
+                if (getVector3Length(Position.X, Position.Y, height, vehicle.Position.X, vehicle.Position.Y, vehicle.Routes[vehicle.CurrentSegmentIndex].Height) <= Constants.proximityWarningThreshold)
                 {
                     proximityWarnings.Add(vehicle);
                 }
@@ -542,7 +551,7 @@ namespace projekt_PO
         {
             List<Obstacle> proximityWarnings = new List<Obstacle>(); //tablica samolotów które mogą być zbyt blisko z danym samolotem
 
-            
+
 
             double getVector3Length(double x1, double y1, double z1, double x2, double y2, double z2)
 
@@ -724,7 +733,7 @@ namespace projekt_PO
         }
 
     }
-    
+
     //The MIT License
 
     //Copyright(c) 2012-2013 Martin Thoma
