@@ -47,15 +47,15 @@ namespace PO_wpf
             //map.Vehicles.AddRange(generator.generateVehicles(5)); //<---- tutaj można zmienić ilość pojazdów które są generowane
 
             a.Position = new projekt_PO.Point(0, 0);
-            Segment A1 = new Segment(new projekt_PO.Point(0, 0), new projekt_PO.Point(400, 400), 100, 500);
-            Segment A2 = new Segment(new projekt_PO.Point(400, 400), new projekt_PO.Point(500, 400), 50, 500);
+            Segment A1 = new Segment(new projekt_PO.Point(0, 0), new projekt_PO.Point(400, 400), 100, 0);
+            Segment A2 = new Segment(new projekt_PO.Point(400, 400), new projekt_PO.Point(500, 400), 50, 0);
             a.Routes = new List<Segment> { A1, A2 };
 
             map.addVehicle(a);
 
             b.Position = new projekt_PO.Point(200, 0);
-            Segment B1 = new Segment(new projekt_PO.Point(200, 0), new projekt_PO.Point(0, 200), 100, 500);
-            Segment B2 = new Segment(new projekt_PO.Point(0, 200), new projekt_PO.Point(200, 400), 50, 500);
+            Segment B1 = new Segment(new projekt_PO.Point(200, 0), new projekt_PO.Point(0, 200), 100, 0);
+            Segment B2 = new Segment(new projekt_PO.Point(0, 200), new projekt_PO.Point(200, 400), 50, 0);
             b.Routes = new List<Segment> { B1, B2 };
 
             Console.WriteLine(b.Routes[0].Begin.X);

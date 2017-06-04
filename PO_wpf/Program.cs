@@ -286,6 +286,7 @@ namespace projekt_PO
                             vehicle.Position = vehicle.Routes[vehicle.CurrentSegmentIndex].End;
                             vehicle.CurrentSegmentIndex++;
                             vehicle.Route = vehicle.Routes[vehicle.CurrentSegmentIndex];
+                            vehicle.Height = vehicle.Routes[vehicle.CurrentSegmentIndex].Height;
                             Console.WriteLine("SWITCHING ROUTES");
                         }
                     }
@@ -362,7 +363,7 @@ namespace projekt_PO
     public class Obstacle //nie dziedziczy z Map, jest wolnostojącym obiektem
     {
         Point position = new Point(); //pozycja x, y przeszkody
-        double width, length, height; //szerokosc długosc wysokośc przeszkody (Nie ma tego w UMLu a powinno być) WZGLĘDEM LEWEGO GORNEGO ROGU
+        double width, length, height;//szerokosc długosc wysokośc przeszkody (Nie ma tego w UMLu a powinno być) WZGLĘDEM LEWEGO GORNEGO ROGU
 
         public Obstacle() //konstruktor używany głównie podczas testowania
         {
