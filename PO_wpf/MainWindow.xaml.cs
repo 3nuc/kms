@@ -16,11 +16,18 @@ using System.Windows.Shapes;
 using projekt_PO;
 using System.ComponentModel;
 
+// DODAJ WYSOKOSC DO TABELKI W XAML
+
 namespace PO_wpf
 {
     /// <summary>
     /// Logika interakcji dla klasy MainWindow.xaml
     /// </summary>
+    /// 
+    public static class WindowConstanst
+    {
+        public const double VehilceImageSize = 5;
+    }
     public partial class MainWindow : Window
     {
         public const string IMG = "pack://application:,,,/img/placeholder.bmp";
@@ -70,7 +77,7 @@ namespace PO_wpf
 
             foreach (Vehicle v in map.Vehicles)
             {
-                VehicleObject obj = new VehicleObject(v, AddVehicle(v), AddLines(v));
+                VehicleObject obj = new VehicleObject(v, AddVehicle(v), AddLines(v), AddBorder(v));
                 vehicleobjectlist.Add(obj);
             }
 
@@ -81,6 +88,8 @@ namespace PO_wpf
             CollisionsList.ItemsSource = map.Collisions;
 
             StartAsyncProcess(map, vehicleobjectlist);
+
+            
         }
 
         private async void StartAsyncProcess(Map map, List<VehicleObject> list)           //metoda asynchroniczna
@@ -122,7 +131,9 @@ namespace PO_wpf
                         //obj.Img.Margin = new Thickness(obj.Vhc.Position.X, 0, 0, obj.Vhc.Position.Y);
                         Canvas.SetBottom(obj.Img, obj.Vhc.Position.Y - (obj.Img.Height)/2);
                         Canvas.SetLeft(obj.Img, obj.Vhc.Position.X - (obj.Img.Width)/2);
-                        
+                        Canvas.SetBottom(obj.Brdr, obj.Vhc.Position.Y - (obj.Img.Height) / 2 - 2);
+                        Canvas.SetLeft(obj.Brdr, obj.Vhc.Position.X - (obj.Img.Width) / 2 - 2);
+
                         obj.Lines[0].X1 = obj.Vhc.Position.X;
                         obj.Lines[0].Y1 = Constants.mapSizeY - obj.Vhc.Position.Y;
                         if (obj.Vhc.CurrentSegmentIndex > obj.CurrentLineIndex)
@@ -131,18 +142,18 @@ namespace PO_wpf
                             obj.CurrentLineIndex++;
                         }
 
-                        if (obj.Vhc.ReachedDestination)
-                        {
-                            Image img = new Image();
-                            img.Source = new BitmapImage(new Uri(IMG));
-                            img.Height = 1;
-                            img.Width = 1;
+                        //if (obj.Vhc.ReachedDestination)
+                        //{
+                        //    Image img = new Image();
+                        //    img.Source = new BitmapImage(new Uri(IMG));
+                        //    img.Height = 1;
+                        //    img.Width = 1;
 
-                            MapCanvas.Children.Add(img);
+                        //    MapCanvas.Children.Add(img);
 
-                            Canvas.SetBottom(img, obj.Vhc.Position.Y - (img.Height) / 2);
-                            Canvas.SetLeft(img, obj.Vhc.Position.X - (img.Width) / 2);
-                        }
+                        //    Canvas.SetBottom(img, obj.Vhc.Position.Y - (img.Height) / 2);
+                        //    Canvas.SetLeft(img, obj.Vhc.Position.X - (img.Width) / 2);
+                        //}
                     }
                 });
             }
@@ -177,8 +188,8 @@ namespace PO_wpf
 
             //img.RenderTransformOrigin = new System.Windows.Point(0.5,0.5);
             //img.Margin = new Thickness(vhc.Position.X, 0, 0, vhc.Position.Y);
-            img.Height = 5;
-            img.Width = 5;
+            img.Height = WindowConstanst.VehilceImageSize;
+            img.Width = WindowConstanst.VehilceImageSize;
             //img.HorizontalAlignment = HorizontalAlignment.Left;
             //img.VerticalAlignment = VerticalAlignment.Bottom;
 
@@ -214,16 +225,46 @@ namespace PO_wpf
 
             return lines;
         }
+
+        public Border AddBorder(Vehicle vhc)
+        {
+            Border border = new Border();
+            border.BorderBrush = System.Windows.Media.Brushes.Green;
+            border.BorderThickness = new Thickness(2, 2, 2, 2);
+            border.Height = WindowConstanst.VehilceImageSize + 4;
+            border.Width = WindowConstanst.VehilceImageSize + 4;
+            border.Visibility = Visibility.Hidden;
+
+            MapCanvas.Children.Add(border);
+
+            Canvas.SetBottom(border, vhc.Position.Y - WindowConstanst.VehilceImageSize / 2 - 2);
+            Canvas.SetLeft(border, vhc.Position.X - WindowConstanst.VehilceImageSize / 2 - 2);
+
+            return border;
+        }
+
+        private void VehicleList_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
+        {
+            if (VehicleList.SelectedIndex == -1) return;
+            VehicleObject vhc = VehicleList.SelectedItems[0] as VehicleObject;
+            this.Dispatcher.Invoke(() => vhc.Brdr.Visibility = Visibility.Visible);
+        }
     }
 
     public class VehicleObject   //każdy pojazd ma swój odpowiednik na mapie
     {
         private List<Line> lines;
         private Image img;
+        private Border brdr;
         private Vehicle vhc;
         private string vehicleType;
         private int currentLineIndex = 0;
 
+        public Border Brdr
+        {
+            get { return brdr; }
+            set { brdr = value; }
+        }
         public int CurrentLineIndex
         {
             get { return currentLineIndex; }
@@ -262,12 +303,13 @@ namespace PO_wpf
             }
         }
 
-        public VehicleObject(Vehicle _vhc, Image _img, List<Line> _lines)
+        public VehicleObject(Vehicle _vhc, Image _img, List<Line> _lines, Border _brdr)
         {
             vhc = _vhc;
             img = _img;
             lines = _lines;
             vehicleType = _vhc.GetType().Name;
+            brdr = _brdr;
         }
     }
 }
