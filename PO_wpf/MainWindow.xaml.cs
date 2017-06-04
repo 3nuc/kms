@@ -38,8 +38,13 @@ namespace PO_wpf
 
             a.Position = new projekt_PO.Point(0, 0);
 
-            a.Routes = generator.generateRoutes(3, a); //<------wygenerowana trasa
-            map.Vehicles.AddRange(generator.generateVehicles(500)); //<---- tutaj można zmienić ilość pojazdów które są generowane
+            //a.Routes = generator.generateRoutes(3, a); //<------wygenerowana trasa
+            map.Vehicles.AddRange(generator.generateVehicles(7)); //<---- tutaj można zmienić ilość pojazdów które są generowane
+
+            a.Position = new projekt_PO.Point(0, 0);
+            Segment A1 = new Segment(new projekt_PO.Point(0, 0), new projekt_PO.Point(400, 400), 100, 500);
+            Segment A2 = new Segment(new projekt_PO.Point(400, 400), new projekt_PO.Point(500, 400), 50, 500);
+            a.Routes = new List<Segment> { A1, A2 };
 
             map.addVehicle(a);
 
@@ -71,19 +76,19 @@ namespace PO_wpf
 
             VehicleList.ItemsSource = vehicleobjectlist;
 
-            List<Obstacle> collisiontest = map.Vehicles[0].detectCollisions(map);
+            map.DetectAllCollisions(map);
 
-            CollisionsList.ItemsSource = collisiontest;
+            CollisionsList.ItemsSource = map.Collisions;
 
-            StartAsyncProcess(map, vehicleobjectlist, collisiontest);
+            StartAsyncProcess(map, vehicleobjectlist);
         }
 
-        private async void StartAsyncProcess(Map map, List<VehicleObject> list, List<Obstacle> clist)           //metoda asynchroniczna
+        private async void StartAsyncProcess(Map map, List<VehicleObject> list)           //metoda asynchroniczna
         {
-            await Task.Run(() => ProcessNextFrame(map, list, clist));
+            await Task.Run(() => ProcessNextFrame(map, list));
         }
 
-        private async void ProcessNextFrame(Map map, List<VehicleObject> list, List<Obstacle> clist)
+        private async void ProcessNextFrame(Map map, List<VehicleObject> list)
         {
             while (true)
             {
@@ -104,14 +109,13 @@ namespace PO_wpf
                 }
                 
                 map.nextFrame();
-                clist = map.Vehicles[0].detectCollisions(map);
                 //BindingOperations.GetBindingExpressionBase(VehicleList, ListView.ItemsSourceProperty).UpdateTarget();
                 this.Dispatcher.Invoke(() =>        //gdy inny wątek chce zmienić UI wątku głównego używamy tej instrukcji
                 {
                     VehicleList.ItemsSource = null;         //Update Binding
                     VehicleList.ItemsSource = list;         //Refreshes Values
                     CollisionsList.ItemsSource = null;
-                    CollisionsList.ItemsSource = clist;
+                    CollisionsList.ItemsSource = map.Collisions;
 
                     foreach (VehicleObject obj in list)
                     {
