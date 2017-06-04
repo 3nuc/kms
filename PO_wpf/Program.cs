@@ -14,9 +14,11 @@ namespace projekt_PO
     {
         public const double mapSizeX = 500; //podpiąć do MainWindow.xaml
         public const double mapSizeY = 500;
-        public const double startingVehicleHeight = 1000;
+        public const double startingVehicleHeight = 0;
         public const int routesMaxNumberOfSegments = 5;
         public const int proximityWarningThreshold = 20;
+        public static int colisionThreshold = 5;
+
         public class Plane
         {
             public const double speed = 200;
@@ -267,6 +269,35 @@ namespace projekt_PO
 
             return colls;
         }
+
+        public List<Collision> DetectAllProximities(Map map)
+        {
+            List<Collision> colls = new List<Collision>();
+
+            foreach (Vehicle vhc in vehicles)
+            {
+                List<Obstacle> list = vhc.detectProximity(map);
+
+                foreach (Obstacle obs in list)
+                {
+                    colls.Add(new Collision(vhc, obs));
+                }
+            }
+
+            for (int i = 0; i < colls.Count; i++)
+            {
+                for (int j = i + 1; j < colls.Count; j++)
+                {
+                    if ((colls[i].Obs == colls[j].Obs && colls[i].Vhc == colls[j].Vhc) ||
+                         (colls[i].Vhc.Position.X == colls[j].Obs.Position.X && colls[i].Vhc.Position.Y == colls[j].Obs.Position.Y))
+                    {
+                        colls.RemoveAt(j);
+                    }
+                }
+            }
+
+            return colls;
+        }
     }
 
     public class Obstacle //nie dziedziczy z Map, jest wolnostojącym obiektem
@@ -406,16 +437,22 @@ namespace projekt_PO
         /// </summary>
         public Segment getGhostRoute()
         {
+            if (reachedDestination) return new Segment(new Point(0, 0), new Point(0, 0));
             double speed = Routes[currentSegmentIndex].Speed;
             double horizontalDisplacement = Routes[currentSegmentIndex].End.X - Routes[currentSegmentIndex].Begin.X;
             double verticalDisplacement = Routes[currentSegmentIndex].End.Y - Routes[currentSegmentIndex].Begin.Y;
             double routeLength = Routes[currentSegmentIndex].getLength();
+            Segment routeLeft = new Segment(Position, Routes[currentSegmentIndex].End);
 
             double displaceByY = (verticalDisplacement / routeLength) * speed;
             double displaceByX = (horizontalDisplacement / routeLength) * speed;
 
 
+            
             Segment distanceTraveledPlusDisplaceBy = new Segment(Position, new Point(Position.X + displaceByX, Position.Y + displaceByY));
+            if (routeLeft.getLength() < distanceTraveledPlusDisplaceBy.getLength())
+                return routeLeft;
+            else
             return distanceTraveledPlusDisplaceBy;
         }
         //metoda public Vehicle detectCollisions() odziedziczony z Obstacle tutaj (dla przypomnienia)
@@ -427,7 +464,7 @@ namespace projekt_PO
             foreach (Vehicle vehicle in _map.Vehicles) //każdy Vehicle sprawdza czy żaden Vehicle się z nim nie zderzy
             {
                 if (vehicle == this) continue;
-                if (vehicle.getGhostRoute().checkIntersection(this.getGhostRoute()))
+                if (vehicle.getGhostRoute().checkIntersection(this.getGhostRoute()) && Math.Abs(vehicle.Routes[vehicle.currentSegmentIndex].Height - Routes[CurrentSegmentIndex].Height) <= Constants.colisionThreshold) //jeżeli trasy się przecinają i wysokości różnią się od siebie o max 5 to mamy kolizje
                 {
                     collisions.Add(vehicle);
                     Console.WriteLine("collision detected");
