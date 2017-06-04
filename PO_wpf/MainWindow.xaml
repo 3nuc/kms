@@ -9,7 +9,7 @@
     <Grid Name="main">
         <TextBlock Name="txtbox" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Pojazdy:" VerticalAlignment="Top"/>
         <Grid Name="VehicleListGrid" HorizontalAlignment="Left" MinHeight="50" MaxHeight="200" Margin="10,21,0,0" VerticalAlignment="Top" Width="235">
-            <ListView Name="VehicleList" SelectionChanged="VehicleList_SelectionChanged_1" >
+            <ListView Name="VehicleList" SelectionChanged="VehicleList_SelectionChanged_1" SelectionMode="Multiple" >
                 <ListView.View>
                     <GridView AllowsColumnReorder="True">
                         <GridView.Columns>
