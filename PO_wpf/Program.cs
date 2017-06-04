@@ -186,6 +186,7 @@ namespace projekt_PO
         public Vehicle()
         {
             routes = new List<Segment>();
+            route = new Segment();
             currentSegmentIndex = 0;
             ReachedDestination = false;
         }
