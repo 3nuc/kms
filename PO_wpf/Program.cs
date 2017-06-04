@@ -443,7 +443,13 @@ namespace projekt_PO
 
             //TODO: change of route in the middle of new segment splits segment into two and adds the change route segment to the list
 
-            Routes[currentSegmentIndex].End = new Point(_xend, _yend);
+            Routes.RemoveRange(currentSegmentIndex - 1, Routes.Count() - currentSegmentIndex - 1); //wyrzuć wszystkie odcinki przed aktualnym oraz aktualny
+            Routes.Add(new Segment(Routes[currentSegmentIndex - 1].End, Position)); //stwórz nowy odcinek między końcem ostatniego istniejącego a obecną pozycją samolotu
+            currentSegmentIndex++; //jesteśmy teraz na nowo stworzonym odcinku
+            Routes.Add(new Segment(Position, new Point(_xend, _yend))); //tworzymy nowy odcinek do przebycia
+
+            //cały algorytm jest tak skomplikowany poniewaz podejrzewam że kolega Michał z którym robię projekt będzie wyświetlał trasę na podstawie tablicy Routes, dlatego wolę jej nie kasować całej i zaczynać od nowego odcinka tylko ją "przetworzyć"
+
             Height = _height;
             ReachedDestination = false; //na wypadek jeżeli zmieniamy trasę samolotu który dotarł do celu i na nim stoi (logika poruszania jest wyłączona dla samolotów które dotarły do celu)
         }
