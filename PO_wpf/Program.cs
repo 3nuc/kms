@@ -40,9 +40,96 @@ namespace projekt_PO
         Ogólnie to w samych zaleceniach projektu na cezie2 jest napisane żeby rozbijac wielkie metody na mniejsze.
         
          Potem po prostu te metody by się podpieło do klasy Map i tyle, chociaz nie wiem czy ta klasa Generator ma sens xD*/
-
-
     {
+
+        private Segment windowTop = new Segment(new Point(0, Constants.mapSizeY), new Point(Constants.mapSizeX, Constants.mapSizeY)); //krawędzie mapy względem dolnego lewego rogu używane do sprawdzania czy generowane trasy nie wykraczają poza mapę
+        private Segment windowBottom = new Segment(new Point(0, 0), new Point(Constants.mapSizeX, 0));
+        private Segment windowLeft = new Segment(new Point(0, 0), new Point(0, Constants.mapSizeY));
+        private Segment windowRight = new Segment(new Point(Constants.mapSizeX, 0), new Point(0, Constants.mapSizeY)); 
+
+
+        public List<Segment> generateRoutes(int routeLengthInSegments, Vehicle vehicle)
+        {
+            List<Segment> generatedRoutes = new List<Segment>();
+            Random numberGenerator = new Random();
+            Point lastSegmentsEnd = new Point();
+
+
+
+            double generateSpeed()
+            {
+                double generatedSpeed = 0;
+
+                if (vehicle.GetType().Name == "Helicopter") generatedSpeed = numberGenerator.Next(Convert.ToInt32(Constants.Helicopter.speed / 2), Convert.ToInt32(Constants.Helicopter.speed * 2));
+                else if (vehicle.GetType().Name == "Glider") generatedSpeed = numberGenerator.Next(Convert.ToInt32(Constants.Glider.speed / 2), Convert.ToInt32(Constants.Glider.speed * 2));
+                else if (vehicle.GetType().Name == "Plane") generatedSpeed = numberGenerator.Next(Convert.ToInt32(Constants.Plane.speed / 2), Convert.ToInt32(Constants.Plane.speed * 2));
+                else if (vehicle.GetType().Name == "Balloon") generatedSpeed = numberGenerator.Next(Convert.ToInt32(Constants.Balloon.speed / 2), Convert.ToInt32(Constants.Balloon.speed * 2));
+                else throw new NotImplementedException();
+
+                return generatedSpeed;
+            }
+
+            double generateHeight()
+            {
+                return numberGenerator.Next(Convert.ToInt32(Constants.startingVehicleHeight / 2), Convert.ToInt32(Constants.startingVehicleHeight * 2));
+            }
+
+            Point generatePoint()
+            {
+                Point generatedPoint = new Point(numberGenerator.Next() % Constants.mapSizeX, numberGenerator.Next() % Constants.mapSizeY);
+                return generatedPoint;
+            }
+
+
+            for (int i = 0; i < routeLengthInSegments; i++)
+            {
+                Point startingPoint;
+                if (i == 0)
+                {
+                    startingPoint = generatePoint(); //wygeneruj punkt początkowy pojedyńczego odcinka trasy jeżeli jest to pierwszy generowany odcinek ...
+                    vehicle.Position = startingPoint;
+                }
+                else
+                    startingPoint = lastSegmentsEnd; // w przeciwnym wypadku ustaw punkt początkowy nowego odcinka na koniec ostatniego (aby trasa była ciągłą linią łamaną)
+
+                Point endingPoint = generatePoint();
+                lastSegmentsEnd = endingPoint;
+
+                while (startingPoint.lengthFrom(endingPoint) < 20)
+                {
+                    endingPoint = generatePoint();
+                }
+
+                generatedRoutes.Add(new Segment(startingPoint, endingPoint, generateSpeed(), generateHeight())); 
+            }
+
+
+
+            return generatedRoutes;
+        }
+
+        public List<Vehicle> generateVehicles(int numberOfVehicles, Map _map)
+        {
+            List<Vehicle> generatedVehicles = new List<Vehicle>();
+            Vehicle generatedVehicle;
+            Random numberGenerator = new Random();
+
+            for (int i = 0; i < numberOfVehicles; i++)
+            {
+                int aircraftPickerRandom = numberGenerator.Next() % 4;
+
+                if (aircraftPickerRandom == 0) generatedVehicle = new Helicopter(); //losowanie jakim rodzajem pojazdu będzie wygenerowany pojazd
+                else if (aircraftPickerRandom == 1) generatedVehicle = new Glider();
+                else if (aircraftPickerRandom == 2) generatedVehicle = new Plane();
+                else if (aircraftPickerRandom == 3) generatedVehicle = new Balloon();
+
+
+            }
+            return generatedVehicles;
+        }
+
+        public List<Obstacle> generateObstacles(int numberOfObstacles, Map _map) { return new List<Obstacle>(); }
+
 
     }
 
@@ -351,11 +438,12 @@ namespace projekt_PO
             end = _end;
         }
 
-        public Segment(Point _begin, Point _end, double _speed)
+        public Segment(Point _begin, Point _end, double _speed, double _height)
         {
             begin = _begin;
             end = _end;
             speed = _speed;
+            height = _height;
         }
 
         public Segment()
