@@ -177,6 +177,7 @@ namespace projekt_PO
         private List<Vehicle> vehicles; //lista pojazdów na mapie
         private List<Obstacle> obstacles; //lista przeszkód na mapie
         private List<Collision> collisions; //lista kolizji na mapie (zmienia się w trakcie wykonywania programu)
+        private List<Collision> proximities; //lista zbliżeń na mapie
 
         private double mapSizeX, mapSizeY; //rozmiar mapy
 
@@ -194,6 +195,7 @@ namespace projekt_PO
         public List<Vehicle> Vehicles { get => vehicles; set => vehicles = value; }
         public List<Obstacle> Obstacles { get => obstacles; set => obstacles = value; }
         public List<Collision> Collisions { get => collisions; set => collisions = value; }
+        public List<Collision> Proximities { get => proximities; set => proximities = value; }
 
         /// <summary>
         /// Dodaje pojazd latający do Map
@@ -256,6 +258,7 @@ namespace projekt_PO
                 }
             }
             collisions = DetectAllCollisions(this);
+            proximities = DetectAllProximities(this);
         }
         public List<Collision> DetectAllCollisions(Map map)
         {

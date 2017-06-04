@@ -66,7 +66,7 @@ namespace PO_wpf
 
             InitializeComponent();
 
-            Width = Constants.mapSizeY+300;             //
+            Width = Constants.mapSizeY+500;             //
             Height = Constants.mapSizeX+100;            //rozmiar okna
             MapBorder.Width = Constants.mapSizeY + 4;       //i mapy
             MapBorder.Height = Constants.mapSizeX + 4;      //
@@ -84,8 +84,10 @@ namespace PO_wpf
             VehicleList.ItemsSource = vehicleobjectlist;
 
             map.DetectAllCollisions(map);
+            map.DetectAllProximities(map);
 
             CollisionsList.ItemsSource = map.Collisions;
+            ProximitiesList.ItemsSource = map.Proximities;
 
             StartAsyncProcess(map, vehicleobjectlist);
 
@@ -109,11 +111,12 @@ namespace PO_wpf
                 {
                     await Task.Run(() =>
                     {
+                        Task.Delay(250).Wait();
                         while ( (this.Dispatcher.Invoke(() => StepControl.IsPressed)) == false )
                         {
                             //pusty while czeka na przyciśnięcie przycisku
                         }
-                        Task.Delay(100).Wait();
+                        
                     });
                 }
                 
@@ -125,6 +128,8 @@ namespace PO_wpf
                     VehicleList.ItemsSource = list;         //Refreshes Values
                     CollisionsList.ItemsSource = null;
                     CollisionsList.ItemsSource = map.Collisions;
+                    ProximitiesList.ItemsSource = null;
+                    ProximitiesList.ItemsSource = map.Proximities;
 
                     foreach (VehicleObject obj in list)
                     {
