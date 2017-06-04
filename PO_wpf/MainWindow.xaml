@@ -31,7 +31,7 @@
             </Canvas>
         </Border>
         <Grid Name="CollisionsListGrid" HorizontalAlignment="Left" MaxHeight="200" MinHeight="50" Height="Auto" Margin="10,226,0,0" VerticalAlignment="Top" Width="205">
-            <ListView Name="CollisionsList">
+            <ListView Name="CollisionsList" SelectionChanged="CollisionsList_SelectionChanged" SelectionMode="Multiple" >
                 <ListView.View>
                     <GridView AllowsColumnReorder="True">
                         <GridView.Columns>

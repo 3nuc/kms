@@ -30,6 +30,7 @@ namespace PO_wpf
     }
     public partial class MainWindow : Window
     {
+        List<VehicleObject> vehicleobjectlist = new List<VehicleObject>();
         public const string IMG = "pack://application:,,,/img/placeholder.bmp";
         //public Random random = new Random();
         public MainWindow()
@@ -37,8 +38,6 @@ namespace PO_wpf
             Generator generator = new Generator();
             Map map = new Map();
             Obstacle obs = new Obstacle(0,0,10,10,200);
-
-            List<VehicleObject> vehicleobjectlist = new List<VehicleObject>();
 
             Helicopter a = new Helicopter();
             Plane b = new Plane();
@@ -116,7 +115,6 @@ namespace PO_wpf
                         {
                             //pusty while czeka na przyciśnięcie przycisku
                         }
-                        
                     });
                 }
                 
@@ -141,6 +139,7 @@ namespace PO_wpf
 
                         obj.Lines[0].X1 = obj.Vhc.Position.X;
                         obj.Lines[0].Y1 = Constants.mapSizeY - obj.Vhc.Position.Y;
+                        obj.Lines[0].Stroke = System.Windows.Media.Brushes.Gray;
                         if (obj.Vhc.CurrentSegmentIndex > obj.CurrentLineIndex)
                         {
                             obj.Lines.RemoveAt(0);
@@ -266,6 +265,26 @@ namespace PO_wpf
                 });
             }
             //VehicleList.UnselectAll();
+        }
+
+        private void CollisionsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CollisionsList.SelectedIndex == -1) return;
+
+            Collision coll = CollisionsList.SelectedItems[0] as Collision;
+            VehicleObject vhco1 = vehicleobjectlist.First(x => x.Vhc == coll.Vhc);
+            VehicleObject vhco2 = vehicleobjectlist.First(x => x.Vhc.Position == coll.Obs.Position);
+            if (CollisionsList.SelectedItems.Count > 1)
+            {
+                vhco1.Lines[0].Stroke = System.Windows.Media.Brushes.Gray;
+                vhco2.Lines[0].Stroke = System.Windows.Media.Brushes.Gray;
+                CollisionsList.SelectedItems.Remove(coll);
+            }
+            else
+            {
+                vhco1.Lines[0].Stroke = System.Windows.Media.Brushes.Red;
+                vhco2.Lines[0].Stroke = System.Windows.Media.Brushes.Red;
+            }
         }
     }
 
