@@ -35,20 +35,20 @@
                 <ListView.View>
                     <GridView AllowsColumnReorder="True">
                         <GridView.Columns>
-                            <GridViewColumn Header="beginx" 
-                            DisplayMemberBinding="{Binding Route.Begin.X}" />
-                            <GridViewColumn Header="beginy" 
-                            DisplayMemberBinding="{Binding Route.Begin.Y}" />
-                            <GridViewColumn Header="endx" 
-                            DisplayMemberBinding="{Binding Route.End.X}" />
-                            <GridViewColumn Header="endy" 
-                            DisplayMemberBinding="{Binding Route.End.Y}" />
+                            <GridViewColumn Header="VehicleX" Width="50"
+                            DisplayMemberBinding="{Binding Vhc.Position.X}" />
+                            <GridViewColumn Header="VehicleY" Width="50"
+                            DisplayMemberBinding="{Binding Vhc.Position.Y}" />
+                            <GridViewColumn Header="ObstacleX" Width="50"
+                            DisplayMemberBinding="{Binding Obs.Position.X}" />
+                            <GridViewColumn Header="ObstacleY" Width="50"
+                            DisplayMemberBinding="{Binding Obs.Position.Y}" />
                         </GridView.Columns>
                     </GridView>
                 </ListView.View>
             </ListView>
         </Grid>
-        <ToggleButton Name="StartControl" Content="Run Simulation Normally" HorizontalAlignment="Left" Margin="10,356,0,0" VerticalAlignment="Top" Width="Auto"/>
-        <Button Name="StepControl" Content="Step" HorizontalAlignment="Left" Margin="10,381,0,0" VerticalAlignment="Top" Width="75"/>
+        <ToggleButton Name="StartControl" Content="Run Simulation Normally" HorizontalAlignment="Left" Margin="10,467,0,0" VerticalAlignment="Top" Width="Auto"/>
+        <Button Name="StepControl" Content="Step" HorizontalAlignment="Left" Margin="10,492,0,0" VerticalAlignment="Top" Width="75"/>
     </Grid>
 </Window>

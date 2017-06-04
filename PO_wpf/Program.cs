@@ -147,6 +147,7 @@ namespace projekt_PO
     {
         private List<Vehicle> vehicles; //klasa Vehicle jest później w kodzie
         private List<Obstacle> obstacles;
+        private List<Collision> collisions;
 
         private double mapSizeX, mapSizeY; //rozmiar mapy
 
@@ -161,7 +162,8 @@ namespace projekt_PO
 
 
         public List<Vehicle> Vehicles { get => vehicles; set => vehicles = value; } //klasa Vehicle jest później w kodzie
-        public List<Obstacle> Obstacles { get => obstacles; set => obstacles = value; }
+        public List<Obstacle> Obstacles { get => obstacles; set => obstacles = value; }     //private set po debugach
+        public List<Collision> Collisions { get => collisions; set => collisions = value; }
 
         public void generate() { } //wygeneruj świat (samoloty i przeszkody)
         public void addVehicle(Vehicle _vehicle)
@@ -215,6 +217,25 @@ namespace projekt_PO
 
                 }
             }
+            collisions = DetectAllCollisions(this);
+        }
+        public List<Collision> DetectAllCollisions(Map map)
+        {
+            List<Collision> colls = new List<Collision>();
+
+            foreach (Vehicle vhc in vehicles)
+            {
+                List<Obstacle> list = vhc.detectCollisions(map);
+
+                foreach (Obstacle obs in list)
+                {
+                    colls.Add(new Collision(vhc, obs));
+                }
+            }
+
+            List<Collision> nodupes = new HashSet<Collision>(colls).ToList();
+
+            return nodupes;
         }
     }
 
@@ -411,6 +432,21 @@ namespace projekt_PO
             return Math.Sqrt(Math.Abs(horizontalDisplacement * horizontalDisplacement + verticalDisplacement * verticalDisplacement));
         }
 
+    }
+
+    public class Collision
+    {
+        private Vehicle vhc;
+        private Obstacle obs;
+
+        public Vehicle Vhc { get { return vhc; } private set { vhc = value; } }
+        public Obstacle Obs { get { return obs; } private set { obs = value; } }
+
+        public Collision(Vehicle _vhc, Obstacle _obs)
+        {
+            vhc = _vhc;
+            obs = _obs;
+        }
     }
 
     public class Segment //odcinek
