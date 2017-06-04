@@ -24,7 +24,7 @@ namespace PO_wpf
     public partial class MainWindow : Window
     {
         public const string IMG = "pack://application:,,,/img/placeholder.bmp";
-        public Random random = new Random();
+        //public Random random = new Random();
         public MainWindow()
         {
             Map map = new Map();
@@ -60,9 +60,6 @@ namespace PO_wpf
             heli4.Route.End = new projekt_PO.Point(400, 400);
 
             map.Vehicles.Add(heli4);
-            //map.vehicles.Add(heli);
-            //map.vehicles.Add(heli);
-            //map.vehicles.Add(heli);
 
             InitializeComponent();
 
@@ -75,7 +72,7 @@ namespace PO_wpf
 
             foreach (Vehicle v in map.Vehicles)
             {
-                VehicleObject obj = new VehicleObject(v, AddVehicle(v));
+                VehicleObject obj = new VehicleObject(v, AddVehicle(v), AddLine(v));
                 vehicleobjectlist.Add(obj);
             }
 
@@ -143,26 +140,47 @@ namespace PO_wpf
             return img;
         }
 
-        
+        public Line AddLine(Vehicle vhc)
+        {
+            Line line = new Line();
+
+            //line.Margin = new Thickness(vhc.Position.X, 0, 0, vhc.Position.Y);
+            //line.HorizontalAlignment = HorizontalAlignment.Left;
+            //line.VerticalAlignment = VerticalAlignment.Bottom;
+            line.StrokeThickness = 1;
+            line.Stroke = System.Windows.Media.Brushes.Gray;
+            line.X1 = vhc.Route.Begin.X;
+            line.X2 = vhc.Route.End.X;
+            line.Y1 = Constants.mapSizeY - vhc.Route.Begin.Y;
+            line.Y2 = Constants.mapSizeY - vhc.Route.End.Y;
+
+            MapCanvas.Children.Add(line);
+
+            return line;
+        }
     }
 
-    public class VehicleObject : INotifyPropertyChanged   //każdy pojazd ma swój odpowiednik na mapie
+    public class VehicleObject   //każdy pojazd ma swój odpowiednik na mapie
     {
+        private Line line;
         private Image img;
         private Vehicle vhc;
+        private string vehicleType;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
+        public Line Line
+        {
+            get { return line; }
+            private set
+            {
+                line = value;
+            }
+        }
         public Image Img
         {
             get { return img; }
             private set
             {
-                if(img != value)
-                {
-                    img = value;
-                    PropertyChanged(this, new PropertyChangedEventArgs("Img"));
-                }
+                img = value;
             }
         }
         public Vehicle Vhc
@@ -170,18 +188,24 @@ namespace PO_wpf
             get { return vhc; }
             private set
             {
-                if (vhc != value)
-                {
-                    vhc = value;
-                    PropertyChanged(this, new PropertyChangedEventArgs("Vhc"));
-                }
+                vhc = value;
+            }
+        }
+        public string VehicleType
+        {
+            get { return vehicleType; }
+            private set
+            {
+                vehicleType = value;
             }
         }
 
-        public VehicleObject(Vehicle _vhc, Image _img)
+        public VehicleObject(Vehicle _vhc, Image _img, Line _line)
         {
             vhc = _vhc;
             img = _img;
+            line = _line;
+            vehicleType = _vhc.GetType().Name;
         }
     }
 }
