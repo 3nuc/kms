@@ -75,21 +75,21 @@ namespace PO_wpf
 
             CollisionsList.ItemsSource = collisiontest;
 
-            ast(map, vehicleobjectlist, collisiontest);
+            StartAsyncProcess(map, vehicleobjectlist, collisiontest);
         }
 
-        private async void ast(Map map, List<VehicleObject> list, List<Obstacle> clist)           //metoda asynchroniczna
+        private async void StartAsyncProcess(Map map, List<VehicleObject> list, List<Obstacle> clist)           //metoda asynchroniczna
         {
-            await Task.Run(() => keepadding(map, list, clist));
+            await Task.Run(() => ProcessNextFrame(map, list, clist));
         }
 
-        private async void keepadding(Map map, List<VehicleObject> list, List<Obstacle> clist)
+        private async void ProcessNextFrame(Map map, List<VehicleObject> list, List<Obstacle> clist)
         {
             while (true)
             {
                 if (this.Dispatcher.Invoke(() => (bool)StartControl.IsChecked))
                 {
-                    Task.Delay(1000).Wait();
+                    Task.Delay(1000).Wait();    //gdy przycisk do normalnej symulacji jest wcisnięty, działaj normalnie
                 }
                 else
                 {
@@ -97,7 +97,7 @@ namespace PO_wpf
                     {
                         while ( (this.Dispatcher.Invoke(() => StepControl.IsPressed)) == false )
                         {
-
+                            //pusty while czeka na przyciśnięcie przycisku
                         }
                         Task.Delay(100).Wait();
                     });
@@ -118,13 +118,27 @@ namespace PO_wpf
                         //obj.Img.Margin = new Thickness(obj.Vhc.Position.X, 0, 0, obj.Vhc.Position.Y);
                         Canvas.SetBottom(obj.Img, obj.Vhc.Position.Y - (obj.Img.Height)/2);
                         Canvas.SetLeft(obj.Img, obj.Vhc.Position.X - (obj.Img.Width)/2);
-
-                        if (obj.Vhc.CurrentSegmentIndex > 0)
-                        {
-                            obj.Lines.RemoveAt(0);
-                        }
+                        
                         obj.Lines[0].X1 = obj.Vhc.Position.X;
                         obj.Lines[0].Y1 = Constants.mapSizeY - obj.Vhc.Position.Y;
+                        if (obj.Vhc.CurrentSegmentIndex > obj.CurrentLineIndex)
+                        {
+                            obj.Lines.RemoveAt(0);
+                            obj.CurrentLineIndex++;
+                        }
+
+                        if (obj.Vhc.ReachedDestination)
+                        {
+                            Image img = new Image();
+                            img.Source = new BitmapImage(new Uri(IMG));
+                            img.Height = 1;
+                            img.Width = 1;
+
+                            MapCanvas.Children.Add(img);
+
+                            Canvas.SetBottom(img, obj.Vhc.Position.Y - (img.Height) / 2);
+                            Canvas.SetLeft(img, obj.Vhc.Position.X - (img.Width) / 2);
+                        }
                     }
                 });
             }
@@ -204,7 +218,13 @@ namespace PO_wpf
         private Image img;
         private Vehicle vhc;
         private string vehicleType;
+        private int currentLineIndex = 0;
 
+        public int CurrentLineIndex
+        {
+            get { return currentLineIndex; }
+            set { currentLineIndex = value; }
+        }
         public List<Line> Lines
         {
             get { return lines; }
