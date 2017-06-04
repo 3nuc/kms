@@ -21,14 +21,14 @@ namespace projekt_PO
         public const double mapSizeY = 500;
         public const double startingVehicleHeight = 0;  //Wartości poczatkowej wysokosci są skonfigurowane aby zawierać się w granicy [startingVehicleHeight/2, startingVehicleHeight*2]. Zatem samoloty są generowane w taki sposób, że ich wysokość początkowa (w zerowej klatce) zawiera się w tej granicy
         public const int routesMaxNumberOfSegments = 5; //Maksymalna ilość odcinków z której składa się trasa generowanych poj. latających
-        public const int proximityWarningThreshold = 20; //Jeżeli odległosć między dwoma poj. latającymi albo poj. latającym i przeszkodą jest mniejsza niż ta, to wysyłane jest ostrzeżenie o zbliżeniu
+        public const int proximityWarningThreshold = 50; //Jeżeli odległosć między dwoma poj. latającymi albo poj. latającym i przeszkodą jest mniejsza niż ta, to wysyłane jest ostrzeżenie o zbliżeniu
         public static int colisionThreshold = 5; //Jeżeli odległość między dwoma poj. latającymi albo poj. latającym i przeszkodą w następnej klatce będzie wynosić mniej niż wartość tu podana, to program traktuje takie zbliżenie jako kolizję - program jest pauzowany.
         public static double routeMinLength = 20;
         public static double routeMaxLength = 300;
 
         public class Plane
         {
-            public const double speed = 80; //średnia wartość prędkości dla obiektu Plane. Prędkość poruszania na poszczególnych odcinkach tras obiektów Plane jest obliczana na podstawie tej wartości. Prędkości są generowane w granicach [speed/2, speed*2]
+            public const double speed = 50; //średnia wartość prędkości dla obiektu Plane. Prędkość poruszania na poszczególnych odcinkach tras obiektów Plane jest obliczana na podstawie tej wartości. Prędkości są generowane w granicach [speed/2, speed*2]
         }
         public class Balloon
         {
@@ -37,7 +37,7 @@ namespace projekt_PO
 
         public class Glider
         {
-            public const double speed = 60;
+            public const double speed = 40;
         }
 
         public class Helicopter
@@ -220,11 +220,28 @@ namespace projekt_PO
             vehicles.Add(_vehicle);
             //właściwie lista vehicles jest zakapsułowana i ma własny setter, ale metoda została zachowana ze względu na kompatybilność wsteczną
         }
+
+        /// <summary>
+        /// Wprowadza dane przeszkód naziemnych do Mapy
+        /// </summary>
+        /// <param name="PATH">Ścieżka do pliku w formacie "X:\folder\text.txt"</param>
+        /// <returns>Powodzenie operacji ładowania</returns>
+        public bool loadObstaclesFromFile(String PATH)
+        {
+            String[] data = System.IO.File.ReadAllLines(@PATH); //plik z PATH ma specyfikacje Obstacle każdy w oddzielnej linii (5 Obstacle = 5 linii)
+            foreach (String item in data)
+            {
+                String[] line = item.Split(null); //rozdzielaj po spacji
+                Obstacle currentlyAdded = new Obstacle(Convert.ToInt32(line[0]), Convert.ToInt32(line[1]), Convert.ToInt32(line[2]), Convert.ToInt32(line[3]), Convert.ToInt32(line[4]));
+            }
+
+            
+            return true;
+        }
+
         /// <summary>
         /// Przesuwa wszystkie pojazdy latające w tej mapie o wartość swojej prędkości w odpowiednim kierunku.
         /// </summary>
-
-
         //pierwsza część kodu w tej metodzie polega na obliczaniu wektorów składowych prędkości (prędkość to wartość liczbowa. aby wiedzieć w którą stronę przesunąć samolot musimy znać wektory składowe (wektor poziomy i pionowy)
         //druga część kodu zabezpiecza samolot przed ominięciem punktu końcowego trasy (Route.End) oraz przekierowuje pojazdy latające na odpowiednio dalsze odcinki tras (jeżeli poj. latający dotarł do końca aktualnego)
         public void nextFrame()
@@ -405,7 +422,9 @@ namespace projekt_PO
 
             foreach (Vehicle vehicle in _map.Vehicles) //każdy Obstacle sprawdza czy żaden Vehicle się z nim nie zderzy
             {
-                if (getVector3Length(Position.X, Position.Y, height, vehicle.Position.X, vehicle.Position.Y, vehicle.Routes[vehicle.CurrentSegmentIndex].Height) <= Constants.proximityWarningThreshold)
+                if(vehicle == this) { continue; }
+
+                 if (getVector3Length(Position.X, Position.Y, height, vehicle.Position.X, vehicle.Position.Y, vehicle.Routes[vehicle.CurrentSegmentIndex].Height) <= Constants.proximityWarningThreshold)
                 {
                     proximityWarnings.Add(vehicle);
                 }
@@ -523,6 +542,8 @@ namespace projekt_PO
         {
             List<Obstacle> proximityWarnings = new List<Obstacle>(); //tablica samolotów które mogą być zbyt blisko z danym samolotem
 
+            
+
             double getVector3Length(double x1, double y1, double z1, double x2, double y2, double z2)
 
             {
@@ -535,6 +556,8 @@ namespace projekt_PO
 
             foreach (Vehicle vehicle in _map.Vehicles) //każdy Obstacle sprawdza czy żaden Vehicle się z nim nie zderzy
             {
+                if (vehicle == this) { continue; }
+
                 if (getVector3Length(Position.X, Position.Y, Routes[CurrentSegmentIndex].Height, vehicle.Position.X, vehicle.Position.Y, vehicle.Routes[vehicle.CurrentSegmentIndex].Height) <= Constants.proximityWarningThreshold)
                 {
                     proximityWarnings.Add(vehicle);
