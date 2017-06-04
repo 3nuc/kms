@@ -295,7 +295,7 @@ namespace projekt_PO
 
                 foreach (Vehicle vehicle in _map.Vehicles) //każdy Obstacle sprawdza czy żaden Vehicle się z nim nie zderzy
                 {
-                    if (getVector3Length(Position.X, Position.Y, height, vehicle.Position.X, vehicle.Position.Y, vehicle.Routes[vehicle.CurrentSegmentIndex].Height) >= Constants.proximityWarningThreshold)
+                    if (getVector3Length(Position.X, Position.Y, height, vehicle.Position.X, vehicle.Position.Y, vehicle.Routes[vehicle.CurrentSegmentIndex].Height) <= Constants.proximityWarningThreshold)
                     {
                         proximityWarnings.Add(vehicle);
                     }
@@ -400,7 +400,7 @@ namespace projekt_PO
 
             foreach (Vehicle vehicle in _map.Vehicles) //każdy Obstacle sprawdza czy żaden Vehicle się z nim nie zderzy
             {
-                if (getVector3Length(Position.X, Position.Y, Routes[CurrentSegmentIndex].Height, vehicle.Position.X, vehicle.Position.Y, vehicle.Routes[vehicle.CurrentSegmentIndex].Height) >= Constants.proximityWarningThreshold)
+                if (getVector3Length(Position.X, Position.Y, Routes[CurrentSegmentIndex].Height, vehicle.Position.X, vehicle.Position.Y, vehicle.Routes[vehicle.CurrentSegmentIndex].Height) <= Constants.proximityWarningThreshold)
                 {
                     proximityWarnings.Add(vehicle);
                 }
