@@ -82,11 +82,26 @@ namespace PO_wpf
             await Task.Run(() => keepadding(map, list, clist));
         }
 
-        private void keepadding(Map map, List<VehicleObject> list, List<Obstacle> clist)
+        private async void keepadding(Map map, List<VehicleObject> list, List<Obstacle> clist)
         {
             while (true)
             {
-                Task.Delay(1000).Wait();
+                if (this.Dispatcher.Invoke(() => (bool)StartControl.IsChecked))
+                {
+                    Task.Delay(1000).Wait();
+                }
+                else
+                {
+                    await Task.Run(() =>
+                    {
+                        while ( (this.Dispatcher.Invoke(() => StepControl.IsPressed)) == false )
+                        {
+
+                        }
+                        Task.Delay(100).Wait();
+                    });
+                }
+                
                 map.nextFrame();
                 clist = map.Vehicles[0].detectCollisions(map);
                 //BindingOperations.GetBindingExpressionBase(VehicleList, ListView.ItemsSourceProperty).UpdateTarget();
@@ -103,8 +118,12 @@ namespace PO_wpf
                         Canvas.SetBottom(obj.Img, obj.Vhc.Position.Y - (obj.Img.Height)/2);
                         Canvas.SetLeft(obj.Img, obj.Vhc.Position.X - (obj.Img.Width)/2);
 
-                        obj.Lines[obj.Vhc.CurrentSegmentIndex].X1 = obj.Vhc.Position.X;
-                        obj.Lines[obj.Vhc.CurrentSegmentIndex].Y1 = Constants.mapSizeY - obj.Vhc.Position.Y;
+                        if (obj.Vhc.CurrentSegmentIndex > 0)
+                        {
+                            obj.Lines.RemoveAt(0);
+                        }
+                        obj.Lines[0].X1 = obj.Vhc.Position.X;
+                        obj.Lines[0].Y1 = Constants.mapSizeY - obj.Vhc.Position.Y;
                     }
                 });
             }
