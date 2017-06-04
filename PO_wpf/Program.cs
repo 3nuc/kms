@@ -106,6 +106,7 @@ namespace projekt_PO
                         {
                             vehicle.Position = vehicle.Routes[vehicle.CurrentSegmentIndex].End;
                             vehicle.CurrentSegmentIndex++;
+                            vehicle.Route = vehicle.Routes[vehicle.CurrentSegmentIndex];
                             Console.WriteLine("SWITCHING ROUTES");
                         }
                     }
