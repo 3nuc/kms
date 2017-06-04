@@ -248,9 +248,19 @@ namespace projekt_PO
                 }
             }
 
-            List<Collision> nodupes = new HashSet<Collision>(colls).ToList();
+            for (int i = 0; i < colls.Count; i++)
+            {
+                for (int j = i + 1; j < colls.Count; j++)
+                {
+                    if ( (colls[i].Obs == colls[j].Obs && colls[i].Vhc == colls[j].Vhc) ||
+                         (colls[i].Vhc.Position.X == colls[j].Obs.Position.X && colls[i].Vhc.Position.Y == colls[j].Obs.Position.Y))
+                    {
+                        colls.RemoveAt(j);
+                    }
+                }
+            }
 
-            return nodupes;
+            return colls;
         }
     }
 
