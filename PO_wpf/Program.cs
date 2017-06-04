@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace projekt_PO
 {
+
     public static class Constants //klasa zawierające wszystkie stałe używane w projekcie (wielkośc mapy, prędkości pojazdów)
     {
         public const double mapSizeX = 500; //podpiąć do MainWindow.xaml
@@ -77,16 +78,16 @@ namespace projekt_PO
                                 //druga część kodu zabezpiecza samolot przed ominięciem punktu końcowego trasy (Route.End)
             foreach (Vehicle vehicle in vehicles)
             {
-                double speed = vehicle.Speed;
-                double horizontalDisplacement = vehicle.Route.End.X - vehicle.Route.Begin.X; //przesuniecie na x-ach na route (o ile x-ów się przesuwa między początkiem trasy a końcem)
-                double verticalDisplacement = vehicle.Route.End.Y - vehicle.Route.Begin.Y; //przesuniecie na y
-                double routeLength = vehicle.Route.getLength(); //długość trasy z tw. pitagorasa (długość odcinka zaczynającego się na Route.Begin i kończącego się na Route.End)
+                double speed = vehicle.Routes[vehicle.CurrentSegmentIndex].Speed;
+                double horizontalDisplacement = vehicle.Routes[vehicle.CurrentSegmentIndex].End.X - vehicle.Routes[vehicle.CurrentSegmentIndex].Begin.X; //przesuniecie na x-ach na route (o ile x-ów się przesuwa między początkiem trasy a końcem)
+                double verticalDisplacement = vehicle.Routes[vehicle.CurrentSegmentIndex].End.Y - vehicle.Routes[vehicle.CurrentSegmentIndex].Begin.Y; //przesuniecie na y
+                double routeLength = vehicle.Routes[vehicle.CurrentSegmentIndex].getLength(); //długość trasy z tw. pitagorasa (długość odcinka zaczynającego się na Route.Begin i kończącego się na Route.End)
 
                 double displaceByY = (verticalDisplacement / routeLength) * speed; //wyznaczenie przesunięcia na x i y w jednej klatce
                 double displaceByX = (horizontalDisplacement / routeLength) * speed;
 
                 // poniższa zmienna odpowiada na pytanie "jaki jest dystans między punktem początkowym trasy a pozycją samolotu PLUS przesunięcie o prędkość". Samolot nie jest jeszcze przesunięty!!!
-                double distanceTraveledPlusDisplaceBy = new Segment(vehicle.Route.Begin, new Point(vehicle.Position.X + displaceByX, vehicle.Position.Y + displaceByY)).getLength();
+                double distanceTraveledPlusDisplaceBy = new Segment(vehicle.Routes[vehicle.CurrentSegmentIndex].Begin, new Point(vehicle.Position.X + displaceByX, vehicle.Position.Y + displaceByY)).getLength();
 
 
                 if (!vehicle.ReachedDestination) //jeżeli samolot nie dotarł do celu
@@ -94,9 +95,19 @@ namespace projekt_PO
 
                     if (distanceTraveledPlusDisplaceBy > routeLength) //jeżeli długość trasy po przesunięciu jest dłuższa od trasy, to oznacza że samolot dotrze do celu w tej klatce, jednak nie możemy pozwolić, żeby samolot wyleciał "za" punkt końcowy trasy
                     {
-                        vehicle.Position = new Point(vehicle.Route.End.X, vehicle.Route.End.Y); //jeżeli samolot próbuje przekroczyć końcowy punkt trasy, ustaw poz. samolotu na koniec trasy
-                        vehicle.ReachedDestination = true; //samolot doleciał do celu - nie poruszamy nim już w następnych klatkach (chyba że wywołamy changeRoute później)
-                        vehicle.Height = 0; //samolot wylądował
+                        if (vehicle.CurrentSegmentIndex == vehicle.Routes.Count - 1) //samolot jest na ostatnim odcinku trasy i chce wykroczyć poza końcowy punkt
+                        {
+                            Console.WriteLine("ENDENDEND");
+                            vehicle.Position = vehicle.Routes[vehicle.Routes.Count - 1].End; //jeżeli samolot próbuje przekroczyć końcowy punkt trasy, ustaw poz. samolotu na koniec trasy
+                            vehicle.ReachedDestination = true; //samolot doleciał do celu - nie poruszamy nim już w następnych klatkach (chyba że wywołamy changeRoute później)
+                            vehicle.Height = 0; //samolot wylądował
+                        }
+                        else
+                        {
+                            vehicle.Position = vehicle.Routes[vehicle.CurrentSegmentIndex].End;
+                            vehicle.CurrentSegmentIndex++;
+                            Console.WriteLine("SWITCHING ROUTES");
+                        }
                     }
                     else //jeżeli samolot nie próbuje przekroczyć pkt. końcowego trasy, to wszystko ok  - przesuń samolot
                     {
@@ -165,35 +176,48 @@ namespace projekt_PO
     public class Vehicle : Obstacle //Vehicle dziedziczy z obstacle
     {
         //Position odziedziczone z obstacle
-        private double height; //stała prędkość poruszania się samolotu oraz wysokosc na ktorej aktualnie się znajduje
-        private Segment route;//trasa samolotu zaczynająca się na (xstart, ystart) a kończąca sie (xend, yend) - patrz konstruktor
-        private double speed;
+        private List<Segment> routes;//trasa samolotu zaczynająca się na (xstart, ystart) a kończąca sie (xend, yend) - patrz konstruktor
+        private Segment route;
+        private int currentSegmentIndex;
         private bool reachedDestination;
 
 
         public Vehicle()
         {
-            route = new Segment();
+            routes = new List<Segment>();
+            currentSegmentIndex = 0;
             ReachedDestination = false;
         }
 
-        public Segment Route { get => route; set => route = value; }
-        public double Speed { get => speed; set => speed = value; }
+        public Vehicle(List<Segment> _routes)
+        {
+            routes = _routes;
+            currentSegmentIndex = 0;
+            if (_routes.Any()) route = routes[currentSegmentIndex];
+            ReachedDestination = false;
+        }
+
+        public List<Segment> Routes { get => routes; set => routes = value; }
         public bool ReachedDestination { get => reachedDestination; set => reachedDestination = value; }
+        public int CurrentSegmentIndex { get => currentSegmentIndex; set => currentSegmentIndex = value; }
+        public Segment Route { get => route; set => route = value; }
 
         public void changeRoute(double _xend, double _yend, double _height) //zmien trase lotu pojazdu. poczatkowa pozycja to ta na ktorej aktualnie znajduje sie samolot w aktualnej klatce, a argumenty opisywanej właśnie funkcji to nowy cel. heightnew to nowy pułap na którym leci pojazd
         {
-            Route.End = new Point(_xend, _yend);
+
+            //TODO: change of route in the middle of new segment splits segment into two and adds the change route segment to the list
+
+            Routes[currentSegmentIndex].End = new Point(_xend, _yend);
             Height = _height;
             ReachedDestination = false; //na wypadek jeżeli zmieniamy trasę samolotu który dotarł do celu i na nim stoi (logika poruszania jest wyłączona dla samolotów które dotarły do celu)
         }
 
         public Segment getGhostRoute()
         {
-            double speed = Speed;
-            double horizontalDisplacement = Route.End.X - Route.Begin.X;
-            double verticalDisplacement = Route.End.Y - Route.Begin.Y;
-            double routeLength = Route.getLength();
+            double speed = Routes[currentSegmentIndex].Speed;
+            double horizontalDisplacement = Routes[currentSegmentIndex].End.X - Routes[currentSegmentIndex].Begin.X;
+            double verticalDisplacement = Routes[currentSegmentIndex].End.Y - Routes[currentSegmentIndex].Begin.Y;
+            double routeLength = Routes[currentSegmentIndex].getLength();
 
             double displaceByY = (verticalDisplacement / routeLength) * speed;
             double displaceByX = (horizontalDisplacement / routeLength) * speed;
@@ -210,11 +234,13 @@ namespace projekt_PO
 
             foreach (Vehicle vehicle in _map.Vehicles) //każdy Vehicle sprawdza czy żaden Vehicle się z nim nie zderzy
             {
-                if (vehicle == this) break;
+                if (vehicle == this) continue;
                 if (vehicle.getGhostRoute().checkIntersection(this.getGhostRoute()))
                 {
                     collisions.Add(vehicle);
+                    Console.WriteLine("collision detected");
                 }
+
 
             }
 
@@ -230,7 +256,7 @@ namespace projekt_PO
         public Helicopter() : base()
         {
 
-            Speed = Constants.Helicopter.speed;
+            // Speed = Constants.Helicopter.speed;
             Height = Constants.startingVehicleHeight;
         }
     }
@@ -239,7 +265,7 @@ namespace projekt_PO
     {
         public Glider() : base()
         {
-            Speed = Constants.Glider.speed;
+            //Speed = Constants.Glider.speed;
             Height = Constants.startingVehicleHeight;
         }
     }
@@ -248,7 +274,7 @@ namespace projekt_PO
     {
         public Plane() : base()
         {
-            Speed = Constants.Plane.speed;
+            // Speed = Constants.Plane.speed;
             Height = Constants.startingVehicleHeight;
         }
     }
@@ -257,7 +283,7 @@ namespace projekt_PO
     {
         public Balloon() : base()
         {
-            Speed = Constants.Balloon.speed;
+            //Speed = Constants.Balloon.speed;
             Height = Constants.startingVehicleHeight;
         }
     }
@@ -292,6 +318,8 @@ namespace projekt_PO
     {
 
         private Point begin, end;
+        private double speed;
+        private double height;
 
         public Point Begin
         {
@@ -303,16 +331,29 @@ namespace projekt_PO
             get { return end; }
             set { end = value; }
         }
-        public Segment(double xbegin, double ybegin, double xend, double yend) //professional constructor tyvm gg
+
+        public double Speed { get => speed; set => speed = value; }
+        public double Height { get => height; set => height = value; }
+
+
+
+        public Segment(double xbegin, double ybegin, double xend, double yend)
         {
             begin = new Point(xbegin, ybegin);
             end = new Point(xend, yend);
         }
 
-        public Segment(Point _begin, Point _end) //pleb constructor kek
+        public Segment(Point _begin, Point _end)
         {
             begin = _begin;
             end = _end;
+        }
+
+        public Segment(Point _begin, Point _end, double _speed)
+        {
+            begin = _begin;
+            end = _end;
+            speed = _speed;
         }
 
         public Segment()
@@ -338,6 +379,90 @@ namespace projekt_PO
         }
 
     }
+}
+
+        //class Program
+        //{
+        //    static void Main(string[] args)
+        //    {
+        //        Map map = new Map();
+        //        Plane a = new Plane();
+        //        Plane b = new Plane();
+
+
+        //        a.Position = new Point(0, 0);
+        //        Segment A1 = new Segment(new Point(0, 0), new Point(200, 200), 100);
+        //        Segment A2 = new Segment(new Point(200, 200), new Point(0, 400), 50);
+
+        //        a.Routes = new List<Segment> { A1, A2 };
+
+        //        map.addVehicle(a);
+
+
+        //        b.Position = new Point(200, 0);
+        //        Segment B1 = new Segment(new Point(200, 0), new Point(0, 200), 100);
+        //        Segment B2 = new Segment(new Point(0, 200), new Point(200, 400), 50);
+        //        b.Routes = new List<Segment> { B1, B2 };
+
+        //        Console.WriteLine(b.Routes[0].Begin.X);
+
+        //        map.addVehicle(b);
+        //        map.nextFrame();
+
+        //        while(true)
+        //        {
+        //            Console.WriteLine(a.Position.X + " " + a.Position.Y);
+        //            Console.WriteLine(b.Position.X + " " + b.Position.Y);
+        //            foreach (Obstacle vehicle in map.Vehicles)
+        //            {
+        //                List<Obstacle> colli = vehicle.detectCollisions(map);
+        //                Console.WriteLine(colli.Count);
+        //                foreach (Obstacle collider in colli)
+        //                {
+        //                    Console.WriteLine(nameof(vehicle) + " colliding with " + nameof(collider));
+        //                }
+        //            }
+        //            map.nextFrame();
+        //            int input = Convert.ToInt32(Console.ReadLine());
+        //            if (input == 1) break;
+        //        }
+        //    }
+    }
+
+
+    //class Program
+    //    {
+    //        static void Main(string[] args)
+    //        {
+    //            Map map = new Map();
+    //            Helicopter ehh = new Helicopter();
+
+    //            ehh.Position = new Point(150, 450);
+    //            ehh.Route.Begin = new Point(150, 450);
+    //            ehh.Route.End = new Point(400, 400);
+
+    //            map.addVehicle(ehh);
+
+    //            Console.WriteLine("X: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+    //            map.nextFrame();
+    //            Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+    //            map.nextFrame();
+    //            Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+    //            map.nextFrame();
+    //            map.nextFrame();
+    //            map.nextFrame();
+    //            map.nextFrame();
+    //            map.nextFrame();
+    //            Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+    //        }
+    //    }
+    // }
+
+    // foreach (Obstacle vehicle in map.Vehicles)
+    // {
+    //                    List<Obstacle> colli = vehicle.detectCollisions(map);
+    //                    if(colli.Any()) Console.WriteLine("unresolved collisions - pausing radar");
+    //}
 
     //class Program
     //{
@@ -397,4 +522,3 @@ namespace projekt_PO
     //        Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
     //    }
     //}
-}
