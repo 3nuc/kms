@@ -246,8 +246,21 @@ namespace PO_wpf
         private void VehicleList_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
             if (VehicleList.SelectedIndex == -1) return;
+
             VehicleObject vhc = VehicleList.SelectedItems[0] as VehicleObject;
-            this.Dispatcher.Invoke(() => vhc.Brdr.Visibility = Visibility.Visible);
+            if (VehicleList.SelectedItems.Count > 1)
+            {
+                vhc.Brdr.Visibility = Visibility.Hidden;
+                VehicleList.SelectedItems.Remove(vhc);
+            }
+            else
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    vhc.Brdr.Visibility = Visibility.Visible;
+                });
+            }
+            //VehicleList.UnselectAll();
         }
     }
 
