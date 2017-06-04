@@ -210,7 +210,7 @@ namespace projekt_PO
 
             foreach (Vehicle vehicle in _map.Vehicles) //każdy Vehicle sprawdza czy żaden Vehicle się z nim nie zderzy
             {
-                if (vehicle == this) break;
+                if (vehicle == this) continue;
                 if (vehicle.getGhostRoute().checkIntersection(this.getGhostRoute()))
                 {
                     collisions.Add(vehicle);

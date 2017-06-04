@@ -8,7 +8,7 @@
         Title="MainWindow" Height="{Binding WindowHeight, Mode=TwoWay}" Width="{Binding WindowWidth}" d:DesignWidth="800" d:DesignHeight="600">
     <Grid Name="main">
         <TextBlock Name="txtbox" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Pojazdy:" VerticalAlignment="Top"/>
-        <Grid Name="VehicleListCanvas" HorizontalAlignment="Left" Height="473" Margin="10,21,0,0" VerticalAlignment="Top" Width="235">
+        <Grid Name="VehicleListGrid" HorizontalAlignment="Left" Height="200" MaxHeight="200" Margin="10,21,0,0" VerticalAlignment="Top" Width="235">
             <ListView Name="VehicleList">
                 <ListView.View>
                     <GridView AllowsColumnReorder="True">
@@ -30,5 +30,23 @@
                 <Image Height="10" Canvas.Left="50" Canvas.Top="50" Width="10" x:Name="img1" Source="pack://application:,,,/img/placeholder.bmp" RenderTransformOrigin="0.033,0.067"/>
             </Canvas>
         </Border>
+        <Grid Name="CollisionsListGrid" HorizontalAlignment="Left" MaxHeight="200" Height="Auto" Margin="10,226,0,0" VerticalAlignment="Top" Width="235">
+            <ListView Name="CollisionsList">
+                <ListView.View>
+                    <GridView AllowsColumnReorder="True">
+                        <GridView.Columns>
+                            <GridViewColumn Header="beginx" 
+                            DisplayMemberBinding="{Binding Route.Begin.X}" />
+                            <GridViewColumn Header="beginy" 
+                            DisplayMemberBinding="{Binding Route.Begin.Y}" />
+                            <GridViewColumn Header="endx" 
+                            DisplayMemberBinding="{Binding Route.End.X}" />
+                            <GridViewColumn Header="endy" 
+                            DisplayMemberBinding="{Binding Route.End.Y}" />
+                        </GridView.Columns>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
     </Grid>
 </Window>

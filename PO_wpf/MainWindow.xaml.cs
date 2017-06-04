@@ -28,7 +28,7 @@ namespace PO_wpf
         public MainWindow()
         {
             Map map = new Map();
-            Obstacle obs = new Obstacle(20,20,10,10,200);
+            Obstacle obs = new Obstacle(0,0,10,10,200);
             Helicopter heli = new Helicopter();
             Helicopter heli2 = new Helicopter();
             Helicopter heli3 = new Helicopter();
@@ -43,23 +43,23 @@ namespace PO_wpf
 
             map.Vehicles.Add(heli);
 
-            heli2.Position = new projekt_PO.Point(100, 100);
-            heli2.Route.Begin = new projekt_PO.Point(100, 100);
-            heli2.Route.End = new projekt_PO.Point(400, 400);
+            heli2.Position = new projekt_PO.Point(400, 0);
+            heli2.Route.Begin = new projekt_PO.Point(400, 0);
+            heli2.Route.End = new projekt_PO.Point(0, 400);
 
             map.Vehicles.Add(heli2);
 
-            heli3.Position = new projekt_PO.Point(200, 0);
-            heli3.Route.Begin = new projekt_PO.Point(200, 0);
-            heli3.Route.End = new projekt_PO.Point(400, 400);
+            //heli3.Position = new projekt_PO.Point(200, 0);
+            //heli3.Route.Begin = new projekt_PO.Point(200, 0);
+            //heli3.Route.End = new projekt_PO.Point(400, 400);
 
-            map.Vehicles.Add(heli3);
+            //map.Vehicles.Add(heli3);
 
-            heli4.Position = new projekt_PO.Point(150, 450);
-            heli4.Route.Begin = new projekt_PO.Point(150, 450);
-            heli4.Route.End = new projekt_PO.Point(400, 400);
+            //heli4.Position = new projekt_PO.Point(150, 450);
+            //heli4.Route.Begin = new projekt_PO.Point(150, 450);
+            //heli4.Route.End = new projekt_PO.Point(400, 400);
 
-            map.Vehicles.Add(heli4);
+            //map.Vehicles.Add(heli4);
 
             InitializeComponent();
 
@@ -80,25 +80,33 @@ namespace PO_wpf
 
             VehicleList.ItemsSource = vehicleobjectlist;
 
-            ast(map, vehicleobjectlist);
+            List<Obstacle> collisiontest = map.Vehicles[0].detectCollisions(map);
+
+            CollisionsList.ItemsSource = collisiontest;
+
+            ast(map, vehicleobjectlist, collisiontest);
         }
 
-        private async void ast(Map map, List<VehicleObject> list)           //metoda asynchroniczna
+        private async void ast(Map map, List<VehicleObject> list, List<Obstacle> clist)           //metoda asynchroniczna
         {
-            await Task.Run(() => keepadding(map, list));
+            await Task.Run(() => keepadding(map, list, clist));
         }
 
-        private void keepadding(Map map, List<VehicleObject> list)
+        private void keepadding(Map map, List<VehicleObject> list, List<Obstacle> clist)
         {
             while (true)
             {
                 Task.Delay(1000).Wait();
                 map.nextFrame();
+                clist = map.Vehicles[0].detectCollisions(map);
                 //BindingOperations.GetBindingExpressionBase(VehicleList, ListView.ItemsSourceProperty).UpdateTarget();
                 this.Dispatcher.Invoke(() =>        //gdy inny wątek chce zmienić UI wątku głównego używamy tej instrukcji
                 {
                     VehicleList.ItemsSource = null;         //Update Binding
                     VehicleList.ItemsSource = list;         //Refreshes Values
+                    CollisionsList.ItemsSource = null;
+                    CollisionsList.ItemsSource = clist;
+
                     foreach (VehicleObject obj in list)
                     {
                         //obj.Img.Margin = new Thickness(obj.Vhc.Position.X, 0, 0, obj.Vhc.Position.Y);
@@ -115,14 +123,17 @@ namespace PO_wpf
 
             img.Source = new BitmapImage(new Uri(IMG));     //Uri do zdjęcia; Source ma typ ImageSource
 
-            img.RenderTransformOrigin = new System.Windows.Point(0, 0);
-            img.Margin = new Thickness(obs.Position.X, obs.Position.Y, 0, 0);
+            //img.RenderTransformOrigin = new System.Windows.Point(0, 0);
+            //img.Margin = new Thickness(obs.Position.X, obs.Position.Y, 0, 0);
             img.Height = obs.Length;
             img.Width = obs.Width;
-            img.HorizontalAlignment = HorizontalAlignment.Left;
-            img.VerticalAlignment = VerticalAlignment.Bottom;
+            //img.HorizontalAlignment = HorizontalAlignment.Left;
+            //img.VerticalAlignment = VerticalAlignment.Bottom;
 
             MapCanvas.Children.Add(img);
+
+            Canvas.SetBottom(img, obs.Position.Y - (img.Height) / 2);
+            Canvas.SetLeft(img, obs.Position.X - (img.Width) / 2);
 
             return img;
         }
