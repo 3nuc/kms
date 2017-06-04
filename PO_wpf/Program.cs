@@ -10,22 +10,25 @@ using System.Threading.Tasks;
 namespace projekt_PO
 {
 
-    public static class Constants //klasa zawierające wszystkie stałe używane w projekcie (wielkośc mapy, prędkości pojazdów)
+    /// <summary>
+    /// Klasa zawierająca wszelkie globalne zmienne konfiguracyjne (średnie prędkości dla poszczególnych pojazdów, globalny rozmiar mapy itd.). Więcej szczegółów niżej
+    /// </summary>
+    public static class Constants
     {
-        public const double mapSizeX = 500; //podpiąć do MainWindow.xaml
+        public const double mapSizeX = 500; //rozmiar mapy
         public const double mapSizeY = 500;
-        public const double startingVehicleHeight = 0;
-        public const int routesMaxNumberOfSegments = 5;
-        public const int proximityWarningThreshold = 20;
-        public static int colisionThreshold = 5;
+        public const double startingVehicleHeight = 500;  //Wartości poczatkowej wysokosci są skonfigurowane aby zawierać się w granicy [startingVehicleHeight/2, startingVehicleHeight*2]. Zatem samoloty są generowane w taki sposób, że ich wysokość początkowa (w zerowej klatce) zawiera się w tej granicy
+        public const int routesMaxNumberOfSegments = 5; //Maksymalna ilość odcinków z której składa się trasa generowanych poj. latających
+        public const int proximityWarningThreshold = 20; //Jeżeli odległosć między dwoma poj. latającymi albo poj. latającym i przeszkodą jest mniejsza niż ta, to wysyłane jest ostrzeżenie o zbliżeniu
+        public static int colisionThreshold = 5; //Jeżeli odległość między dwoma poj. latającymi albo poj. latającym i przeszkodą w następnej klatce będzie wynosić mniej niż wartość tu podana, to program traktuje takie zbliżenie jako kolizję - program jest pauzowany.
 
         public class Plane
         {
-            public const double speed = 200;
+            public const double speed = 200; //średnia wartość prędkości dla obiektu Plane. Prędkość poruszania na poszczególnych odcinkach tras obiektów Plane jest obliczana na podstawie tej wartości. Prędkości są generowane w granicach [speed/2, speed*2]
         }
         public class Balloon
         {
-            public const double speed = 50;
+            public const double speed = 50; //to samo co wyżej, tylko dla Balloon
         }
 
         public class Glider
@@ -39,35 +42,30 @@ namespace projekt_PO
         }
     }
 
-    public class Generator /*chyba przydałoby się zrobić taka klase Generator w której sa wszystkie
-        metody np. generateRoute, generateVehicles, generateObstacles żeby nie robić gigantycznej metody generate() w klasie Map.
-        Ogólnie to w samych zaleceniach projektu na cezie2 jest napisane żeby rozbijac wielkie metody na mniejsze.
-        
-         Potem po prostu te metody by się podpieło do klasy Map i tyle, chociaz nie wiem czy ta klasa Generator ma sens xD*/
-
-
+    /// <summary>
+    /// Klasa zajmująca się losową generacją pojazdów, preszkód i tras dla pojazdów
+    /// </summary>
+    public class Generator
     {
-
-        //private Segment windowTop = new Segment(new Point(0, Constants.mapSizeY), new Point(Constants.mapSizeX, Constants.mapSizeY)); //krawędzie mapy względem dolnego lewego rogu używane do sprawdzania czy generowane trasy nie wykraczają poza mapę
-        //private Segment windowBottom = new Segment(new Point(0, 0), new Point(Constants.mapSizeX, 0));
-        //private Segment windowLeft = new Segment(new Point(0, 0), new Point(0, Constants.mapSizeY));
-        //private Segment windowRight = new Segment(new Point(Constants.mapSizeX, 0), new Point(0, Constants.mapSizeY));
-
-        //powyższe nieużywane, znaleziono inną implementację
-
-
+            /// <summary>
+            /// Generuje losowo trasę (z odpowiednią wysokością i prędkością (w zależności od pojazdu))
+            /// </summary>
+            /// <param name="routeLengthInSegments">Z ilu odcinków ma się składać trasa</param>
+            /// <param name="vehicle">dla jakiego rodzaju pojazdu jest generowana trasa</param>
+            /// <returns></returns>
         public List<Segment> generateRoutes(int routeLengthInSegments, Vehicle vehicle)
         {
-            List<Segment> generatedRoutes = new List<Segment>();
-            Random numberGenerator = new Random(Guid.NewGuid().GetHashCode());
-            Point lastSegmentsEnd = new Point();
+            List<Segment> generatedRoutes = new List<Segment>(); //lista tras zwracana na końcu programu
+            Random numberGenerator = new Random(Guid.NewGuid().GetHashCode()); //generator liczb losowych
+            Point lastSegmentsEnd = new Point(); //zmienna przechowywująca koniec ostatniego wygenerowanego odcinka
 
 
-
+            ///Generuje losowo prędkość na danym odcinku. Prędkość zależy od "średniej" prędkości dla danego pojazdu. np. Plane jest w 100% przypadków szybszy niż Balloon
             double generateSpeed()
             {
                 double generatedSpeed = 0;
 
+                //prędkość zależy od typu pojazdu latającego               | Wygeneruj prędkość między wartością                        tą\/                                             a tą \/
                 if (vehicle.GetType().Name == "Helicopter") generatedSpeed = numberGenerator.Next(Convert.ToInt32(Constants.Helicopter.speed / 2), Convert.ToInt32(Constants.Helicopter.speed * 2));
                 else if (vehicle.GetType().Name == "Glider") generatedSpeed = numberGenerator.Next(Convert.ToInt32(Constants.Glider.speed / 2), Convert.ToInt32(Constants.Glider.speed * 2));
                 else if (vehicle.GetType().Name == "Plane") generatedSpeed = numberGenerator.Next(Convert.ToInt32(Constants.Plane.speed / 2), Convert.ToInt32(Constants.Plane.speed * 2));
@@ -76,12 +74,13 @@ namespace projekt_PO
 
                 return generatedSpeed;
             }
-
+            
+            ///Generuje losowo wysokość dla danego odcinka na podstawie wartości konfiguracyjnych z klasy Constants
             double generateHeight()
             {
                 return numberGenerator.Next(Convert.ToInt32(Constants.startingVehicleHeight / 2), Convert.ToInt32(Constants.startingVehicleHeight * 2));
             }
-
+            ///Generuje punkt o losowych współrzędnych X i Y
             Point generatePoint()
             {
                 Point generatedPoint = new Point(numberGenerator.Next() % Constants.mapSizeX, numberGenerator.Next() % Constants.mapSizeY);
@@ -89,21 +88,21 @@ namespace projekt_PO
             }
 
 
-            for (int i = 0; i < routeLengthInSegments; i++)
+            for (int i = 0; i < routeLengthInSegments; i++) //wygeneruj routeLengthInSegments odcinków
             {
                 Point startingPoint;
-                if (i == 0)
+                if (i == 0) //jeżeli jest to pierwszy generowany odcinek
                 {
-                    startingPoint = generatePoint(); //wygeneruj punkt początkowy pojedyńczego odcinka trasy jeżeli jest to pierwszy generowany odcinek ...
-                    vehicle.Position = startingPoint;
+                    startingPoint = generatePoint(); //wygeneruj punkt początkowy trasy ...
+                    vehicle.Position = startingPoint; //i ustaw ten punkt jako pozycję pojazdu latającego
                 }
                 else
-                    startingPoint = lastSegmentsEnd; // w przeciwnym wypadku ustaw punkt początkowy nowego odcinka na koniec ostatniego (aby trasa była ciągłą linią łamaną)
+                    startingPoint = lastSegmentsEnd; //jeżeli jest to n-ty generowany odcinek (nie pierwszy), to wiemy że np. drugi odcinek będzie miał początek tam gdzie pierwszy miał koniec. zatem ustawiamy początek nowego odcinka tam gdzie ostatnio stworzony się kończył
 
-                Point endingPoint = generatePoint();
-                lastSegmentsEnd = endingPoint;
+                Point endingPoint = generatePoint(); //wygeneruj losowo punkt końcowy
+                lastSegmentsEnd = endingPoint; //odśwież wartość punktu końcowego (aby kolejny odcinek wiedział gdzie postawić punkt początkowy)
 
-                while (startingPoint.lengthFrom(endingPoint) < 20)
+                while (startingPoint.lengthFrom(endingPoint) < 20 || startingPoint.lengthFrom(endingPoint) > 500) //jeżeli wygenerowany odcinek jest zbyt krótki lub długi, wygeneruj nowy
                 {
                     endingPoint = generatePoint();
                 }
@@ -116,6 +115,11 @@ namespace projekt_PO
             return generatedRoutes;
         }
 
+        /// <summary>
+        /// Generuje podaną ilośc pojazdów wraz z trasami (na podstawie wartości konfiguracyjnych w klasie Constants)
+        /// </summary>
+        /// <param name="numberOfVehicles">Ile pojazdów wygenerować</param>
+        /// <returns>Lista wygenerowanych pojazdów</returns>
         public List<Vehicle> generateVehicles(int numberOfVehicles)
         {
             List<Vehicle> generatedVehicles = new List<Vehicle>();
@@ -163,9 +167,9 @@ namespace projekt_PO
 
     public class Map //OBSTACLE NIE DZIEDZICZY Z MAP (w przeciwienstwie do tego co moze sugerowac UML)
     {
-        private List<Vehicle> vehicles; //klasa Vehicle jest później w kodzie
-        private List<Obstacle> obstacles;
-        private List<Collision> collisions;
+        private List<Vehicle> vehicles; //lista pojazdów na mapie
+        private List<Obstacle> obstacles; //lista przeszkód na mapie
+        private List<Collision> collisions; //lista kolizji na mapie (zmienia się w trakcie wykonywania programu)
 
         private double mapSizeX, mapSizeY; //rozmiar mapy
 
@@ -176,13 +180,18 @@ namespace projekt_PO
 
             vehicles = new List<Vehicle>();
             obstacles = new List<Obstacle>();
+            collisions = new List<Collision>();
         }
 
 
-        public List<Vehicle> Vehicles { get => vehicles; set => vehicles = value; } //klasa Vehicle jest później w kodzie
-        public List<Obstacle> Obstacles { get => obstacles; set => obstacles = value; }     //private set po debugach
+        public List<Vehicle> Vehicles { get => vehicles; set => vehicles = value; }
+        public List<Obstacle> Obstacles { get => obstacles; set => obstacles = value; } 
         public List<Collision> Collisions { get => collisions; set => collisions = value; }
 
+        /// <summary>
+        /// Dodaje pojazd latający do Map
+        /// </summary>
+        /// <param name="_vehicle">Dodawany pojazd</param>
         public void addVehicle(Vehicle _vehicle)
         {  
             vehicles.Add(_vehicle);
