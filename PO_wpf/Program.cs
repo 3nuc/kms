@@ -16,6 +16,7 @@ namespace projekt_PO
         public const double mapSizeY = 500;
         public const double startingVehicleHeight = 1000;
         public const int routesMaxNumberOfSegments = 5;
+        public const int proximityWarningThreshold = 20;
         public class Plane
         {
             public const double speed = 200;
@@ -50,7 +51,7 @@ namespace projekt_PO
         //private Segment windowLeft = new Segment(new Point(0, 0), new Point(0, Constants.mapSizeY));
         //private Segment windowRight = new Segment(new Point(Constants.mapSizeX, 0), new Point(0, Constants.mapSizeY));
 
-            //powyższe nieużywane, znaleziono inną implementację
+        //powyższe nieużywane, znaleziono inną implementację
 
 
         public List<Segment> generateRoutes(int routeLengthInSegments, Vehicle vehicle)
@@ -105,7 +106,7 @@ namespace projekt_PO
                     endingPoint = generatePoint();
                 }
 
-                generatedRoutes.Add(new Segment(startingPoint, endingPoint, generateSpeed(), generateHeight())); 
+                generatedRoutes.Add(new Segment(startingPoint, endingPoint, generateSpeed(), generateHeight()));
             }
 
 
@@ -128,7 +129,7 @@ namespace projekt_PO
                 else if (aircraftPickerRandom == 2) generatedVehicle = new Plane();
                 else if (aircraftPickerRandom == 3) generatedVehicle = new Balloon();
 
-                generatedVehicle.Routes = generateRoutes((numberGenerator.Next() % Constants.routesMaxNumberOfSegments)+1, generatedVehicle);
+                generatedVehicle.Routes = generateRoutes((numberGenerator.Next() % Constants.routesMaxNumberOfSegments) + 1, generatedVehicle);
                 //generatedVehicle.Position ustawione przez generateRoutes, speed oraz height też
 
                 generatedVehicle.CurrentSegmentIndex = 0;
@@ -137,349 +138,412 @@ namespace projekt_PO
             }
             return generatedVehicles;
         }
-
-        public List<Obstacle> generateObstacles(int numberOfObstacles, Map _map) { return new List<Obstacle>(); }
-
-
     }
 
-    public class Map //OBSTACLE NIE DZIEDZICZY Z MAP (w przeciwienstwie do tego co moze sugerowac UML)
-    {
-        private List<Vehicle> vehicles; //klasa Vehicle jest później w kodzie
-        private List<Obstacle> obstacles;
+        //    public List<Obstacle> generateObstacles(int numberOfObstacles) {
 
-        private double mapSizeX, mapSizeY; //rozmiar mapy
+        //        List<Obstacle> generatedObstacles = new List<Obstacle>();
+        //        Obstacle generatedObstacle = new Obstacle();
+        //        Random numberGenerator = new Random(Guid.NewGuid().GetHashCode());
 
-        public Map()
+        //        Point generatePoint()
+        //        {
+        //            Point generatedPoint = new Point(numberGenerator.Next() % Constants.mapSizeX, numberGenerator.Next() % Constants.mapSizeY);
+        //            return generatedPoint;
+        //        }
+
+        //        generatedObstacle.Position = generatePoint();
+
+        //        return new List<Obstacle>(); }
+
+
+        //}
+
+        public class Map //OBSTACLE NIE DZIEDZICZY Z MAP (w przeciwienstwie do tego co moze sugerowac UML)
         {
-            mapSizeX = Constants.mapSizeX;
-            mapSizeY = Constants.mapSizeY;
+            private List<Vehicle> vehicles; //klasa Vehicle jest później w kodzie
+            private List<Obstacle> obstacles;
 
-            vehicles = new List<Vehicle>();
-            obstacles = new List<Obstacle>();
-        }
+            private double mapSizeX, mapSizeY; //rozmiar mapy
 
-
-        public List<Vehicle> Vehicles { get => vehicles; set => vehicles = value; } //klasa Vehicle jest później w kodzie
-        public List<Obstacle> Obstacles { get => obstacles; set => obstacles = value; }
-
-        public void generate() { } //wygeneruj świat (samoloty i przeszkody)
-        public void addVehicle(Vehicle _vehicle)
-        {   //dodaj pojazd latajacy do mapy
-            vehicles.Add(_vehicle);
-
-            //przypomnienie: metoda ma dodać pojazd do listy vehicles
-        }
-        public void nextFrame() //przeskocz do następnej klatki (przesuń wszystkie samoloty o wartość ich prędkości)
-        {                       //pierwsza część kodu w tej metodzie polega na obliczaniu wektorów składowych prędkości (prędkość to wartość liczbowa. aby wiedzieć w którą stronę przesunąć samolot musimy znać wektory składowe (wektor poziomy i pionowy)
-                                //druga część kodu zabezpiecza samolot przed ominięciem punktu końcowego trasy (Route.End)
-            foreach (Vehicle vehicle in vehicles)
+            public Map()
             {
-                double speed = vehicle.Routes[vehicle.CurrentSegmentIndex].Speed;
-                double horizontalDisplacement = vehicle.Routes[vehicle.CurrentSegmentIndex].End.X - vehicle.Routes[vehicle.CurrentSegmentIndex].Begin.X; //przesuniecie na x-ach na route (o ile x-ów się przesuwa między początkiem trasy a końcem)
-                double verticalDisplacement = vehicle.Routes[vehicle.CurrentSegmentIndex].End.Y - vehicle.Routes[vehicle.CurrentSegmentIndex].Begin.Y; //przesuniecie na y
-                double routeLength = vehicle.Routes[vehicle.CurrentSegmentIndex].getLength(); //długość trasy z tw. pitagorasa (długość odcinka zaczynającego się na Route.Begin i kończącego się na Route.End)
+                mapSizeX = Constants.mapSizeX;
+                mapSizeY = Constants.mapSizeY;
 
-                double displaceByY = (verticalDisplacement / routeLength) * speed; //wyznaczenie przesunięcia na x i y w jednej klatce
-                double displaceByX = (horizontalDisplacement / routeLength) * speed;
-
-                // poniższa zmienna odpowiada na pytanie "jaki jest dystans między punktem początkowym trasy a pozycją samolotu PLUS przesunięcie o prędkość". Samolot nie jest jeszcze przesunięty!!!
-                double distanceTraveledPlusDisplaceBy = new Segment(vehicle.Routes[vehicle.CurrentSegmentIndex].Begin, new Point(vehicle.Position.X + displaceByX, vehicle.Position.Y + displaceByY)).getLength();
+                vehicles = new List<Vehicle>();
+                obstacles = new List<Obstacle>();
+            }
 
 
-                if (!vehicle.ReachedDestination) //jeżeli samolot nie dotarł do celu
+            public List<Vehicle> Vehicles { get => vehicles; set => vehicles = value; } //klasa Vehicle jest później w kodzie
+            public List<Obstacle> Obstacles { get => obstacles; set => obstacles = value; }
+
+            public void addVehicle(Vehicle _vehicle)
+            {   //dodaj pojazd latajacy do mapy
+                vehicles.Add(_vehicle);
+
+                //przypomnienie: metoda ma dodać pojazd do listy vehicles
+            }
+            public void nextFrame() //przeskocz do następnej klatki (przesuń wszystkie samoloty o wartość ich prędkości)
+            {                       //pierwsza część kodu w tej metodzie polega na obliczaniu wektorów składowych prędkości (prędkość to wartość liczbowa. aby wiedzieć w którą stronę przesunąć samolot musimy znać wektory składowe (wektor poziomy i pionowy)
+                                    //druga część kodu zabezpiecza samolot przed ominięciem punktu końcowego trasy (Route.End)
+                foreach (Vehicle vehicle in vehicles)
                 {
+                    double speed = vehicle.Routes[vehicle.CurrentSegmentIndex].Speed;
+                    double horizontalDisplacement = vehicle.Routes[vehicle.CurrentSegmentIndex].End.X - vehicle.Routes[vehicle.CurrentSegmentIndex].Begin.X; //przesuniecie na x-ach na route (o ile x-ów się przesuwa między początkiem trasy a końcem)
+                    double verticalDisplacement = vehicle.Routes[vehicle.CurrentSegmentIndex].End.Y - vehicle.Routes[vehicle.CurrentSegmentIndex].Begin.Y; //przesuniecie na y
+                    double routeLength = vehicle.Routes[vehicle.CurrentSegmentIndex].getLength(); //długość trasy z tw. pitagorasa (długość odcinka zaczynającego się na Route.Begin i kończącego się na Route.End)
 
-                    if (distanceTraveledPlusDisplaceBy > routeLength) //jeżeli długość trasy po przesunięciu jest dłuższa od trasy, to oznacza że samolot dotrze do celu w tej klatce, jednak nie możemy pozwolić, żeby samolot wyleciał "za" punkt końcowy trasy
-                    {
-                        if (vehicle.CurrentSegmentIndex == vehicle.Routes.Count - 1) //samolot jest na ostatnim odcinku trasy i chce wykroczyć poza końcowy punkt
-                        {
-                            Console.WriteLine("ENDENDEND");
-                            vehicle.Position = vehicle.Routes[vehicle.Routes.Count - 1].End; //jeżeli samolot próbuje przekroczyć końcowy punkt trasy, ustaw poz. samolotu na koniec trasy
-                            vehicle.ReachedDestination = true; //samolot doleciał do celu - nie poruszamy nim już w następnych klatkach (chyba że wywołamy changeRoute później)
-                            vehicle.Height = 0; //samolot wylądował
-                        }
-                        else
-                        {
-                            vehicle.Position = vehicle.Routes[vehicle.CurrentSegmentIndex].End;
-                            vehicle.CurrentSegmentIndex++;
-                            vehicle.Route = vehicle.Routes[vehicle.CurrentSegmentIndex];
-                            Console.WriteLine("SWITCHING ROUTES");
-                        }
-                    }
-                    else //jeżeli samolot nie próbuje przekroczyć pkt. końcowego trasy, to wszystko ok  - przesuń samolot
-                    {
-                        vehicle.Position.X += displaceByX;
-                        vehicle.Position.Y += displaceByY;
-                    }
+                    double displaceByY = (verticalDisplacement / routeLength) * speed; //wyznaczenie przesunięcia na x i y w jednej klatce
+                    double displaceByX = (horizontalDisplacement / routeLength) * speed;
 
+                    // poniższa zmienna odpowiada na pytanie "jaki jest dystans między punktem początkowym trasy a pozycją samolotu PLUS przesunięcie o prędkość". Samolot nie jest jeszcze przesunięty!!!
+                    double distanceTraveledPlusDisplaceBy = new Segment(vehicle.Routes[vehicle.CurrentSegmentIndex].Begin, new Point(vehicle.Position.X + displaceByX, vehicle.Position.Y + displaceByY)).getLength();
+
+
+                    if (!vehicle.ReachedDestination) //jeżeli samolot nie dotarł do celu
+                    {
+
+                        if (distanceTraveledPlusDisplaceBy > routeLength) //jeżeli długość trasy po przesunięciu jest dłuższa od trasy, to oznacza że samolot dotrze do celu w tej klatce, jednak nie możemy pozwolić, żeby samolot wyleciał "za" punkt końcowy trasy
+                        {
+                            if (vehicle.CurrentSegmentIndex == vehicle.Routes.Count - 1) //samolot jest na ostatnim odcinku trasy i chce wykroczyć poza końcowy punkt
+                            {
+                                Console.WriteLine("ENDENDEND");
+                                vehicle.Position = vehicle.Routes[vehicle.Routes.Count - 1].End; //jeżeli samolot próbuje przekroczyć końcowy punkt trasy, ustaw poz. samolotu na koniec trasy
+                                vehicle.ReachedDestination = true; //samolot doleciał do celu - nie poruszamy nim już w następnych klatkach (chyba że wywołamy changeRoute później)
+                                vehicle.Height = 0; //samolot wylądował
+                            }
+                            else
+                            {
+                                vehicle.Position = vehicle.Routes[vehicle.CurrentSegmentIndex].End;
+                                vehicle.CurrentSegmentIndex++;
+                                vehicle.Route = vehicle.Routes[vehicle.CurrentSegmentIndex];
+                                Console.WriteLine("SWITCHING ROUTES");
+                            }
+                        }
+                        else //jeżeli samolot nie próbuje przekroczyć pkt. końcowego trasy, to wszystko ok  - przesuń samolot
+                        {
+                            vehicle.Position.X += displaceByX;
+                            vehicle.Position.Y += displaceByY;
+                        }
+
+                    }
                 }
             }
         }
-    }
 
-    public class Obstacle //nie dziedziczy z Map, jest wolnostojącym obiektem
-    {
-        Point position = new Point(); //pozycja x, y przeszkody
-        double width, length, height; //szerokosc długosc wysokośc przeszkody (Nie ma tego w UMLu a powinno być) WZGLĘDEM LEWEGO GORNEGO ROGU
-
-        public Obstacle() //konstruktor do debugu
+        public class Obstacle //nie dziedziczy z Map, jest wolnostojącym obiektem
         {
-            Position = new Point(Position.X = Constants.mapSizeX / 2, Position.Y = Constants.mapSizeY / 2);
-            width = length = height = 20;
-        }
-        public Obstacle(double _x, double _y, double _width, double _length, double _height) //właściwy konstruktor
-        {
-            position = new Point();
-            Position.X = _x;
-            Position.Y = _y;
-            width = _width;
-            length = _length;
-            height = _height;
-        }//czy my w ogóle musimy robić przeszkody naziemne o zmiennych rozmiarach? w specyfikacji projektu nic o tym nie ma 
+            Point position = new Point(); //pozycja x, y przeszkody
+            double width, length, height; //szerokosc długosc wysokośc przeszkody (Nie ma tego w UMLu a powinno być) WZGLĘDEM LEWEGO GORNEGO ROGU
 
-        public double Width { get => width; set => width = value; }
-        public double Length { get => length; set => length = value; }
-        public double Height { get => height; set => height = value; }
-        public Point Position { get => position; set => position = value; }
+            public Obstacle() //konstruktor do debugu
+            {
+                Position = new Point(Position.X = Constants.mapSizeX / 2, Position.Y = Constants.mapSizeY / 2);
+                width = length = height = 20;
+            }
+            public Obstacle(double _x, double _y, double _width, double _length, double _height) //właściwy konstruktor
+            {
+                position = new Point();
+                Position.X = _x;
+                Position.Y = _y;
+                width = _width;
+                length = _length;
+                height = _height;
+            }//czy my w ogóle musimy robić przeszkody naziemne o zmiennych rozmiarach? w specyfikacji projektu nic o tym nie ma 
 
-        virtual public List<Obstacle> detectCollisions(Map _map)
+            public double Width { get => width; set => width = value; }
+            public double Length { get => length; set => length = value; }
+            public double Height { get => height; set => height = value; }
+            public Point Position { get => position; set => position = value; }
+
+            virtual public List<Obstacle> detectCollisions(Map _map) //sprawdzamy czy z przeszkodą naziemną w następnej klatce nie zderzy się żaden samolot (jeżeli się zderzy to następnie w MainWindow.xaml.cs jest to przechwytywane)
+            {
+                List<Obstacle> collisions = new List<Obstacle>(); //tablica samolotów które mogą kolidować z daną przeszkodą naziemną
+                Segment obstacleBottom = new Segment(position, new Point(position.X + width, position.Y));
+                Segment obstacleTop = new Segment(new Point(position.X, position.Y + length), new Point(position.X + width, position.Y + length));
+                Segment obstacleLeft = new Segment(position, new Point(position.X, position.Y + length));
+                Segment obstacleRight = new Segment(new Point(position.X + width, position.Y), new Point(position.X + width, position.Y));
+
+                foreach (Vehicle vehicle in _map.Vehicles) //każdy Obstacle sprawdza czy żaden Vehicle się z nim nie zderzy
+                {
+                    if (vehicle.getGhostRoute().checkIntersection(obstacleBottom) || //jeżeli samolot chce przelecieć przez jakikolwiek z boków przeszkody
+                       vehicle.getGhostRoute().checkIntersection(obstacleTop) ||
+                       vehicle.getGhostRoute().checkIntersection(obstacleLeft) ||
+                       vehicle.getGhostRoute().checkIntersection(obstacleBottom))
+                    {
+                        collisions.Add(vehicle);
+                    }
+
+                }
+
+                return collisions;
+            }
+            virtual public List<Obstacle> detectProximity(Map _map) //sprawdzamy czy z przeszkodą naziemną w następnej klatce nie zderzy się żaden samolot (jeżeli się zderzy to następnie w MainWindow.xaml.cs jest to przechwytywane)
+            {
+                List<Obstacle> proximityWarnings = new List<Obstacle>(); //tablica samolotów które mogą kolidować z daną przeszkodą naziemną
+
+                double getVector3Length(double x1, double y1, double z1, double x2, double y2, double z2)
+                {
+                    double xDisplacement = Math.Abs(x2 - x1);
+                    double yDisplacement = Math.Abs(y2 - y1);
+                    double zDisplacement = Math.Abs(z2 - z1);
+
+                    return Math.Sqrt(Math.Pow(xDisplacement, 2) + Math.Pow(yDisplacement, 2) + Math.Pow(zDisplacement, 2));
+                }
+
+                foreach (Vehicle vehicle in _map.Vehicles) //każdy Obstacle sprawdza czy żaden Vehicle się z nim nie zderzy
+                {
+                    if (getVector3Length(Position.X, Position.Y, height, vehicle.Position.X, vehicle.Position.Y, vehicle.Routes[vehicle.CurrentSegmentIndex].Height) >= Constants.proximityWarningThreshold)
+                    {
+                        proximityWarnings.Add(vehicle);
+                    }
+
+                }
+
+                return proximityWarnings;
+            }
+
+        } 
+
+
+
+        public class Vehicle : Obstacle //Vehicle dziedziczy z obstacle
         {
-            List<Obstacle> collisions = new List<Obstacle>();
-            Segment obstacleBottom = new Segment(position, new Point(position.X + width, position.Y));
-            Segment obstacleTop = new Segment(new Point(position.X, position.Y + length), new Point(position.X + width, position.Y + length));
-            Segment obstacleLeft = new Segment(position, new Point(position.X, position.Y + length));
-            Segment obstacleRight = new Segment(new Point(position.X + width, position.Y), new Point(position.X + width, position.Y));
+            //Position odziedziczone z obstacle
+            private List<Segment> routes;//trasa samolotu zaczynająca się na (xstart, ystart) a kończąca sie (xend, yend) - patrz konstruktor
+            private Segment route;
+            private int currentSegmentIndex;
+            private bool reachedDestination;
+
+
+            public Vehicle()
+            {
+                routes = new List<Segment>();
+                route = new Segment();
+                currentSegmentIndex = 0;
+                ReachedDestination = false;
+            }
+
+            public Vehicle(List<Segment> _routes)
+            {
+                routes = _routes;
+                currentSegmentIndex = 0;
+                if (_routes.Any()) route = routes[currentSegmentIndex];
+                ReachedDestination = false;
+            }
+
+            public List<Segment> Routes { get => routes; set => routes = value; }
+            public bool ReachedDestination { get => reachedDestination; set => reachedDestination = value; }
+            public int CurrentSegmentIndex { get => currentSegmentIndex; set => currentSegmentIndex = value; }
+            public Segment Route { get => route; set => route = value; }
+
+            public void changeRoute(double _xend, double _yend, double _height) //zmien trase lotu pojazdu. poczatkowa pozycja to ta na ktorej aktualnie znajduje sie samolot w aktualnej klatce, a argumenty opisywanej właśnie funkcji to nowy cel. heightnew to nowy pułap na którym leci pojazd
+            {
+
+                //TODO: change of route in the middle of new segment splits segment into two and adds the change route segment to the list
+
+                Routes[currentSegmentIndex].End = new Point(_xend, _yend);
+                Height = _height;
+                ReachedDestination = false; //na wypadek jeżeli zmieniamy trasę samolotu który dotarł do celu i na nim stoi (logika poruszania jest wyłączona dla samolotów które dotarły do celu)
+            }
+
+            public Segment getGhostRoute()
+            {
+                double speed = Routes[currentSegmentIndex].Speed;
+                double horizontalDisplacement = Routes[currentSegmentIndex].End.X - Routes[currentSegmentIndex].Begin.X;
+                double verticalDisplacement = Routes[currentSegmentIndex].End.Y - Routes[currentSegmentIndex].Begin.Y;
+                double routeLength = Routes[currentSegmentIndex].getLength();
+
+                double displaceByY = (verticalDisplacement / routeLength) * speed;
+                double displaceByX = (horizontalDisplacement / routeLength) * speed;
+
+
+                Segment distanceTraveledPlusDisplaceBy = new Segment(Position, new Point(Position.X + displaceByX, Position.Y + displaceByY));
+                return distanceTraveledPlusDisplaceBy;
+            }
+            //metoda public Vehicle detectCollisions() odziedziczony z Obstacle tutaj (dla przypomnienia)
+
+            public override List<Obstacle> detectCollisions(Map _map)
+            {
+                List<Obstacle> collisions = new List<Obstacle>();
+
+                foreach (Vehicle vehicle in _map.Vehicles) //każdy Vehicle sprawdza czy żaden Vehicle się z nim nie zderzy
+                {
+                    if (vehicle == this) continue;
+                    if (vehicle.getGhostRoute().checkIntersection(this.getGhostRoute()))
+                    {
+                        collisions.Add(vehicle);
+                        Console.WriteLine("collision detected");
+                    }
+
+
+                }
+
+                return collisions;
+            }
+
+        public override List<Obstacle> detectProximity(Map _map) //sprawdzamy czy z przeszkodą naziemną w następnej klatce nie zderzy się żaden samolot (jeżeli się zderzy to następnie w MainWindow.xaml.cs jest to przechwytywane)
+        {
+            List<Obstacle> proximityWarnings = new List<Obstacle>(); //tablica samolotów które mogą być zbyt blisko z danym samolotem
+
+            double getVector3Length(double x1, double y1, double z1, double x2, double y2, double z2) 
+                
+            {
+                double xDisplacement = Math.Abs(x2 - x1);
+                double yDisplacement = Math.Abs(y2 - y1);
+                double zDisplacement = Math.Abs(z2 - z1);
+
+                return Math.Sqrt(Math.Pow(xDisplacement, 2) + Math.Pow(yDisplacement, 2) + Math.Pow(zDisplacement, 2));
+            }
 
             foreach (Vehicle vehicle in _map.Vehicles) //każdy Obstacle sprawdza czy żaden Vehicle się z nim nie zderzy
             {
-                if (vehicle.getGhostRoute().checkIntersection(obstacleBottom) || //jeżeli samolot chce przelecieć przez jakikolwiek z boków przeszkody
-                   vehicle.getGhostRoute().checkIntersection(obstacleTop) ||
-                   vehicle.getGhostRoute().checkIntersection(obstacleLeft) ||
-                   vehicle.getGhostRoute().checkIntersection(obstacleBottom))
+                if (getVector3Length(Position.X, Position.Y, Routes[CurrentSegmentIndex].Height, vehicle.Position.X, vehicle.Position.Y, vehicle.Routes[vehicle.CurrentSegmentIndex].Height) >= Constants.proximityWarningThreshold)
                 {
-                    collisions.Add(vehicle);
+                    proximityWarnings.Add(vehicle);
                 }
 
             }
 
-            return collisions;
+            return proximityWarnings;
         }
+    }
 
 
-    } //sprawdź czy program powinien wyrzucić zawiadomienie o możliwej kolizji między tym Obstacle a jakimś pojazdem, jeżeli tak to zwróć jego Obiekt, jeżeli nie to pewnie zwróć NULL czy coś
+        //---------------------------------------RODZAJE POJAZDOW DZIEDZICZACE Z VEHICLE (BALON, HELIKOPTER ETC.)--------------------------------------
 
-
-
-    public class Vehicle : Obstacle //Vehicle dziedziczy z obstacle
-    {
-        //Position odziedziczone z obstacle
-        private List<Segment> routes;//trasa samolotu zaczynająca się na (xstart, ystart) a kończąca sie (xend, yend) - patrz konstruktor
-        private Segment route;
-        private int currentSegmentIndex;
-        private bool reachedDestination;
-
-
-        public Vehicle()
+        public class Helicopter : Vehicle
         {
-            routes = new List<Segment>();
-            route = new Segment();
-            currentSegmentIndex = 0;
-            ReachedDestination = false;
-        }
-
-        public Vehicle(List<Segment> _routes)
-        {
-            routes = _routes;
-            currentSegmentIndex = 0;
-            if (_routes.Any()) route = routes[currentSegmentIndex];
-            ReachedDestination = false;
-        }
-
-        public List<Segment> Routes { get => routes; set => routes = value; }
-        public bool ReachedDestination { get => reachedDestination; set => reachedDestination = value; }
-        public int CurrentSegmentIndex { get => currentSegmentIndex; set => currentSegmentIndex = value; }
-        public Segment Route { get => route; set => route = value; }
-
-        public void changeRoute(double _xend, double _yend, double _height) //zmien trase lotu pojazdu. poczatkowa pozycja to ta na ktorej aktualnie znajduje sie samolot w aktualnej klatce, a argumenty opisywanej właśnie funkcji to nowy cel. heightnew to nowy pułap na którym leci pojazd
-        {
-
-            //TODO: change of route in the middle of new segment splits segment into two and adds the change route segment to the list
-
-            Routes[currentSegmentIndex].End = new Point(_xend, _yend);
-            Height = _height;
-            ReachedDestination = false; //na wypadek jeżeli zmieniamy trasę samolotu który dotarł do celu i na nim stoi (logika poruszania jest wyłączona dla samolotów które dotarły do celu)
-        }
-
-        public Segment getGhostRoute()
-        {
-            double speed = Routes[currentSegmentIndex].Speed;
-            double horizontalDisplacement = Routes[currentSegmentIndex].End.X - Routes[currentSegmentIndex].Begin.X;
-            double verticalDisplacement = Routes[currentSegmentIndex].End.Y - Routes[currentSegmentIndex].Begin.Y;
-            double routeLength = Routes[currentSegmentIndex].getLength();
-
-            double displaceByY = (verticalDisplacement / routeLength) * speed;
-            double displaceByX = (horizontalDisplacement / routeLength) * speed;
-
-
-            Segment distanceTraveledPlusDisplaceBy = new Segment(Position, new Point(Position.X + displaceByX, Position.Y + displaceByY));
-            return distanceTraveledPlusDisplaceBy;
-        }
-        //metoda public Vehicle detectCollisions() odziedziczony z Obstacle tutaj (dla przypomnienia)
-
-        public override List<Obstacle> detectCollisions(Map _map)
-        {
-            List<Obstacle> collisions = new List<Obstacle>();
-
-            foreach (Vehicle vehicle in _map.Vehicles) //każdy Vehicle sprawdza czy żaden Vehicle się z nim nie zderzy
+            public Helicopter() : base()
             {
-                if (vehicle == this) continue;
-                if (vehicle.getGhostRoute().checkIntersection(this.getGhostRoute()))
-                {
-                    collisions.Add(vehicle);
-                    Console.WriteLine("collision detected");
-                }
+
+                // Speed = Constants.Helicopter.speed;
+                Height = Constants.startingVehicleHeight;
+            }
+        }
+
+        public class Glider : Vehicle
+        {
+            public Glider() : base()
+            {
+                //Speed = Constants.Glider.speed;
+                Height = Constants.startingVehicleHeight;
+            }
+        }
+
+        public class Plane : Vehicle
+        {
+            public Plane() : base()
+            {
+                // Speed = Constants.Plane.speed;
+                Height = Constants.startingVehicleHeight;
+            }
+        }
+
+        public class Balloon : Vehicle
+        {
+            public Balloon() : base()
+            {
+                //Speed = Constants.Balloon.speed;
+                Height = Constants.startingVehicleHeight;
+            }
+        }
 
 
+        public class Point
+        {
+            private double x;
+            private double y;
+
+            public double X { get => x; set => x = value; }
+            public double Y { get => y; set => y = value; }
+
+            public Point(double _x, double _y) { x = _x; y = _y; }
+
+            public Point()
+            {
+                x = 0;
+                y = 0;
             }
 
-            return collisions;
+            public double lengthFrom(Point end)
+            {
+                double horizontalDisplacement = end.X - x;
+                double verticalDisplacement = end.Y - y;
+                return Math.Sqrt(Math.Abs(horizontalDisplacement * horizontalDisplacement + verticalDisplacement * verticalDisplacement));
+            }
+
+        }
+
+        public class Segment //odcinek
+        {
+
+            private Point begin, end;
+            private double speed;
+            private double height;
+
+            public Point Begin
+            {
+                get { return begin; }
+                set { begin = value; }
+            }
+            public Point End
+            {
+                get { return end; }
+                set { end = value; }
+            }
+
+            public double Speed { get => speed; set => speed = value; }
+            public double Height { get => height; set => height = value; }
+
+
+
+            public Segment(double xbegin, double ybegin, double xend, double yend)
+            {
+                begin = new Point(xbegin, ybegin);
+                end = new Point(xend, yend);
+            }
+
+            public Segment(Point _begin, Point _end)
+            {
+                begin = _begin;
+                end = _end;
+            }
+
+            public Segment(Point _begin, Point _end, double _speed, double _height)
+            {
+                begin = _begin;
+                end = _end;
+                speed = _speed;
+                height = _height;
+            }
+
+            public Segment()
+            {
+                begin = new Point(0, 0);
+                end = new Point(300, 300);
+            }
+
+            public double getLength()
+            {
+                return begin.lengthFrom(end);
+            }
+
+            public bool checkIntersection(Segment segment)
+            {
+                double crossProductBegin = (segment.End.X - segment.Begin.X) * (Begin.Y - segment.End.Y) - (segment.End.Y - segment.Begin.Y) * (Begin.X - segment.End.X);
+                double crossProductEnd = (segment.End.X - segment.Begin.X) * (End.Y - segment.End.Y) - (segment.End.Y - segment.Begin.Y) * (End.X - segment.End.X);
+
+                double intersectionTestResult = Math.Sign(crossProductBegin) * Math.Sign(crossProductEnd);
+
+                if (intersectionTestResult >= 0) return false;
+                else return true;
+            }
+
         }
     }
-
-
-    //---------------------------------------RODZAJE POJAZDOW DZIEDZICZACE Z VEHICLE (BALON, HELIKOPTER ETC.)--------------------------------------
-
-    public class Helicopter : Vehicle
-    {
-        public Helicopter() : base()
-        {
-
-            // Speed = Constants.Helicopter.speed;
-            Height = Constants.startingVehicleHeight;
-        }
-    }
-
-    public class Glider : Vehicle
-    {
-        public Glider() : base()
-        {
-            //Speed = Constants.Glider.speed;
-            Height = Constants.startingVehicleHeight;
-        }
-    }
-
-    public class Plane : Vehicle
-    {
-        public Plane() : base()
-        {
-            // Speed = Constants.Plane.speed;
-            Height = Constants.startingVehicleHeight;
-        }
-    }
-
-    public class Balloon : Vehicle
-    {
-        public Balloon() : base()
-        {
-            //Speed = Constants.Balloon.speed;
-            Height = Constants.startingVehicleHeight;
-        }
-    }
-
-
-    public class Point
-    {
-        private double x;
-        private double y;
-
-        public double X { get => x; set => x = value; }
-        public double Y { get => y; set => y = value; }
-
-        public Point(double _x, double _y) { x = _x; y = _y; }
-
-        public Point()
-        {
-            x = 0;
-            y = 0;
-        }
-
-        public double lengthFrom(Point end)
-        {
-            double horizontalDisplacement = end.X - x;
-            double verticalDisplacement = end.Y - y;
-            return Math.Sqrt(Math.Abs(horizontalDisplacement * horizontalDisplacement + verticalDisplacement * verticalDisplacement));
-        }
-
-    }
-
-    public class Segment //odcinek
-    {
-
-        private Point begin, end;
-        private double speed;
-        private double height;
-
-        public Point Begin
-        {
-            get { return begin; }
-            set { begin = value; }
-        }
-        public Point End
-        {
-            get { return end; }
-            set { end = value; }
-        }
-
-        public double Speed { get => speed; set => speed = value; }
-        public double Height { get => height; set => height = value; }
-
-
-
-        public Segment(double xbegin, double ybegin, double xend, double yend)
-        {
-            begin = new Point(xbegin, ybegin);
-            end = new Point(xend, yend);
-        }
-
-        public Segment(Point _begin, Point _end)
-        {
-            begin = _begin;
-            end = _end;
-        }
-
-        public Segment(Point _begin, Point _end, double _speed, double _height)
-        {
-            begin = _begin;
-            end = _end;
-            speed = _speed;
-            height = _height;
-        }
-
-        public Segment()
-        {
-            begin = new Point(0, 0);
-            end = new Point(300, 300);
-        }
-
-        public double getLength()
-        {
-            return begin.lengthFrom(end);
-        }
-
-        public bool checkIntersection(Segment segment)
-        {
-            double crossProductBegin = (segment.End.X - segment.Begin.X) * (Begin.Y - segment.End.Y) - (segment.End.Y - segment.Begin.Y) * (Begin.X - segment.End.X);
-            double crossProductEnd = (segment.End.X - segment.Begin.X) * (End.Y - segment.End.Y) - (segment.End.Y - segment.Begin.Y) * (End.X - segment.End.X);
-
-            double intersectionTestResult = Math.Sign(crossProductBegin) * Math.Sign(crossProductEnd);
-
-            if (intersectionTestResult >= 0) return false;
-            else return true;
-        }
-
-    }
-}
 
         //class Program
         //{
@@ -490,134 +554,134 @@ namespace projekt_PO
         //        Plane b = new Plane();
 
 
-        //        a.Position = new Point(0, 0);
-        //        Segment A1 = new Segment(new Point(0, 0), new Point(200, 200), 100);
-        //        Segment A2 = new Segment(new Point(200, 200), new Point(0, 400), 50);
+//        a.Position = new Point(0, 0);
+//        Segment A1 = new Segment(new Point(0, 0), new Point(200, 200), 100);
+//        Segment A2 = new Segment(new Point(200, 200), new Point(0, 400), 50);
 
-        //        a.Routes = new List<Segment> { A1, A2 };
+//        a.Routes = new List<Segment> { A1, A2 };
 
-        //        map.addVehicle(a);
-
-
-        //        b.Position = new Point(200, 0);
-        //        Segment B1 = new Segment(new Point(200, 0), new Point(0, 200), 100);
-        //        Segment B2 = new Segment(new Point(0, 200), new Point(200, 400), 50);
-        //        b.Routes = new List<Segment> { B1, B2 };
-
-        //        Console.WriteLine(b.Routes[0].Begin.X);
-
-        //        map.addVehicle(b);
-        //        map.nextFrame();
-
-        //        while(true)
-        //        {
-        //            Console.WriteLine(a.Position.X + " " + a.Position.Y);
-        //            Console.WriteLine(b.Position.X + " " + b.Position.Y);
-        //            foreach (Obstacle vehicle in map.Vehicles)
-        //            {
-        //                List<Obstacle> colli = vehicle.detectCollisions(map);
-        //                Console.WriteLine(colli.Count);
-        //                foreach (Obstacle collider in colli)
-        //                {
-        //                    Console.WriteLine(nameof(vehicle) + " colliding with " + nameof(collider));
-        //                }
-        //            }
-        //            map.nextFrame();
-        //            int input = Convert.ToInt32(Console.ReadLine());
-        //            if (input == 1) break;
-        //        }
-        //    }
+//        map.addVehicle(a);
 
 
-    //class Program
-    //    {
-    //        static void Main(string[] args)
-    //        {
-    //            Map map = new Map();
-    //            Helicopter ehh = new Helicopter();
+//        b.Position = new Point(200, 0);
+//        Segment B1 = new Segment(new Point(200, 0), new Point(0, 200), 100);
+//        Segment B2 = new Segment(new Point(0, 200), new Point(200, 400), 50);
+//        b.Routes = new List<Segment> { B1, B2 };
 
-    //            ehh.Position = new Point(150, 450);
-    //            ehh.Route.Begin = new Point(150, 450);
-    //            ehh.Route.End = new Point(400, 400);
+//        Console.WriteLine(b.Routes[0].Begin.X);
 
-    //            map.addVehicle(ehh);
+//        map.addVehicle(b);
+//        map.nextFrame();
 
-    //            Console.WriteLine("X: " + ehh.Position.X + "Y: " + ehh.Position.Y);
-    //            map.nextFrame();
-    //            Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
-    //            map.nextFrame();
-    //            Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
-    //            map.nextFrame();
-    //            map.nextFrame();
-    //            map.nextFrame();
-    //            map.nextFrame();
-    //            map.nextFrame();
-    //            Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
-    //        }
-    //    }
-    // }
-
-    // foreach (Obstacle vehicle in map.Vehicles)
-    // {
-    //                    List<Obstacle> colli = vehicle.detectCollisions(map);
-    //                    if(colli.Any()) Console.WriteLine("unresolved collisions - pausing radar");
-    //}
-
-    //class Program
-    //{
-    //    static void Main(string[] args)
-    //    {
-    //        Map map = new Map();
-    //        Plane a = new Plane();
-    //        Plane b = new Plane();
-
-    //        a.Position = new Point(0, 0);
-    //        a.Route.Begin = new Point(0, 0);
-    //        a.Route.End = new Point(400, 400);
-
-    //        map.addVehicle(a);
-
-    //        b.Position = new Point(400, 0);
-    //        b.Route.Begin = new Point(400, 0);
-    //        b.Route.End = new Point(0, 400);
-
-    //        map.addVehicle(b);
-    //        map.nextFrame();
-
-    //        Console.WriteLine(a.Route.checkIntersection(b.Route));
-    //        Console.WriteLine(a.getGhostRoute().checkIntersection(b.getGhostRoute()));
-    //        foreach (Obstacle vehicle in b.detectCollisions(map))
-    //        {
-    //            Console.WriteLine(vehicle.Position.X + " " + vehicle.Position.Y);
-    //        }
-
-    //    }
-    //}
+//        while(true)
+//        {
+//            Console.WriteLine(a.Position.X + " " + a.Position.Y);
+//            Console.WriteLine(b.Position.X + " " + b.Position.Y);
+//            foreach (Obstacle vehicle in map.Vehicles)
+//            {
+//                List<Obstacle> colli = vehicle.detectCollisions(map);
+//                Console.WriteLine(colli.Count);
+//                foreach (Obstacle collider in colli)
+//                {
+//                    Console.WriteLine(nameof(vehicle) + " colliding with " + nameof(collider));
+//                }
+//            }
+//            map.nextFrame();
+//            int input = Convert.ToInt32(Console.ReadLine());
+//            if (input == 1) break;
+//        }
+//    }
 
 
-    //class Program
-    //{
-    //    static void Main(string[] args)
-    //    {
-    //        Map map = new Map();
-    //        Helicopter ehh = new Helicopter();
+//class Program
+//    {
+//        static void Main(string[] args)
+//        {
+//            Map map = new Map();
+//            Helicopter ehh = new Helicopter();
 
-    //        ehh.Position = new Point(150, 450);
-    //        ehh.Route.Begin = new Point(150, 450);
-    //        ehh.Route.End = new Point(400, 400);
+//            ehh.Position = new Point(150, 450);
+//            ehh.Route.Begin = new Point(150, 450);
+//            ehh.Route.End = new Point(400, 400);
 
-    //        map.addVehicle(ehh);
+//            map.addVehicle(ehh);
 
-    //        Console.WriteLine("X: " + ehh.Position.X + "Y: " + ehh.Position.Y);
-    //        map.nextFrame();
-    //        Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
-    //        map.nextFrame();
-    //        Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
-    //        map.nextFrame();
-    //        map.nextFrame();
-    //        map.nextFrame();
-    //        map.nextFrame();
-    //        map.nextFrame();
-    //        Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
-    //    }
-    //}
+//            Console.WriteLine("X: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+//            map.nextFrame();
+//            Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+//            map.nextFrame();
+//            Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+//            map.nextFrame();
+//            map.nextFrame();
+//            map.nextFrame();
+//            map.nextFrame();
+//            map.nextFrame();
+//            Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+//        }
+//    }
+// }
+
+// foreach (Obstacle vehicle in map.Vehicles)
+// {
+//                    List<Obstacle> colli = vehicle.detectCollisions(map);
+//                    if(colli.Any()) Console.WriteLine("unresolved collisions - pausing radar");
+//}
+
+//class Program
+//{
+//    static void Main(string[] args)
+//    {
+//        Map map = new Map();
+//        Plane a = new Plane();
+//        Plane b = new Plane();
+
+//        a.Position = new Point(0, 0);
+//        a.Route.Begin = new Point(0, 0);
+//        a.Route.End = new Point(400, 400);
+
+//        map.addVehicle(a);
+
+//        b.Position = new Point(400, 0);
+//        b.Route.Begin = new Point(400, 0);
+//        b.Route.End = new Point(0, 400);
+
+//        map.addVehicle(b);
+//        map.nextFrame();
+
+//        Console.WriteLine(a.Route.checkIntersection(b.Route));
+//        Console.WriteLine(a.getGhostRoute().checkIntersection(b.getGhostRoute()));
+//        foreach (Obstacle vehicle in b.detectCollisions(map))
+//        {
+//            Console.WriteLine(vehicle.Position.X + " " + vehicle.Position.Y);
+//        }
+
+//    }
+//}
+
+
+//class Program
+//{
+//    static void Main(string[] args)
+//    {
+//        Map map = new Map();
+//        Helicopter ehh = new Helicopter();
+
+//        ehh.Position = new Point(150, 450);
+//        ehh.Route.Begin = new Point(150, 450);
+//        ehh.Route.End = new Point(400, 400);
+
+//        map.addVehicle(ehh);
+
+//        Console.WriteLine("X: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+//        map.nextFrame();
+//        Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+//        map.nextFrame();
+//        Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+//        map.nextFrame();
+//        map.nextFrame();
+//        map.nextFrame();
+//        map.nextFrame();
+//        map.nextFrame();
+//        Console.WriteLine("\nX: " + ehh.Position.X + "Y: " + ehh.Position.Y);
+//    }
+//}
