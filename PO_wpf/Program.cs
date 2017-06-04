@@ -1,4 +1,6 @@
-﻿
+﻿//TODO: zrobić wczytywanie Obstacle z pliku
+//TODO: zrobić wykrywanie zbliżeń
+//TODO: zrobić zmienianie trasy
 
 
 using System;
@@ -26,21 +28,21 @@ namespace projekt_PO
 
         public class Plane
         {
-            public const double speed = 200; //średnia wartość prędkości dla obiektu Plane. Prędkość poruszania na poszczególnych odcinkach tras obiektów Plane jest obliczana na podstawie tej wartości. Prędkości są generowane w granicach [speed/2, speed*2]
+            public const double speed = 80; //średnia wartość prędkości dla obiektu Plane. Prędkość poruszania na poszczególnych odcinkach tras obiektów Plane jest obliczana na podstawie tej wartości. Prędkości są generowane w granicach [speed/2, speed*2]
         }
         public class Balloon
         {
-            public const double speed = 50; //to samo co wyżej, tylko dla Balloon
+            public const double speed = 10; //to samo co wyżej, tylko dla Balloon
         }
 
         public class Glider
         {
-            public const double speed = 120;
+            public const double speed = 60;
         }
 
         public class Helicopter
         {
-            public const double speed = 20;
+            public const double speed = 30;
         }
     }
 
@@ -85,7 +87,7 @@ namespace projekt_PO
             ///Generuje punkt o losowych współrzędnych X i Y
             Point generatePoint()
             {
-                Point generatedPoint = new Point(numberGenerator.Next() % Constants.mapSizeX, numberGenerator.Next() % Constants.mapSizeY);
+                Point generatedPoint = new Point(numberGenerator.Next(0, Convert.ToInt32(Constants.mapSizeX)), numberGenerator.Next(0, Convert.ToInt32(Constants.mapSizeY)));
                 return generatedPoint;
             }
 
@@ -103,7 +105,7 @@ namespace projekt_PO
                     startingPoint = lastSegmentsEnd; //jeżeli jest to n-ty generowany odcinek (nie pierwszy), to wiemy że np. drugi odcinek będzie miał początek tam gdzie pierwszy miał koniec. zatem ustawiamy początek nowego odcinka tam gdzie ostatnio stworzony się kończył
 
                 Point endingPoint = generatePoint(); //wygeneruj losowo punkt końcowy
-                lastSegmentsEnd = endingPoint; //odśwież wartość punktu końcowego (aby kolejny odcinek wiedział gdzie postawić punkt początkowy)
+
 
 
                 //jeżeli wygenerowany odcinek jest zbyt krótki lub długi, wygeneruj nowy
@@ -112,8 +114,20 @@ namespace projekt_PO
                     endingPoint = generatePoint();
                 }
 
+                lastSegmentsEnd = endingPoint; //odśwież wartość punktu końcowego (aby kolejny odcinek wiedział gdzie postawić punkt początkowy)
+
                 //dodaj odcinek o wygenerowanych wcześniej parametrach do listy odcinków zwracanej na końcu programu
                 generatedRoutes.Add(new Segment(startingPoint, endingPoint, generateSpeed(), generateHeight()));
+            }
+
+            for (int i = 1; i < routeLengthInSegments; i++)
+            {
+                if(generatedRoutes[i-1].End != generatedRoutes[i].Begin)
+                {
+                    Console.WriteLine("YOU DUN GOOFED");
+                    Console.WriteLine(vehicle.Position.X + " " + vehicle.Position.Y);
+                    break;
+                }
             }
 
 
@@ -444,7 +458,6 @@ namespace projekt_PO
         public void changeRoute(double _xend, double _yend, double _height)
         {
 
-            //TODO: change of route in the middle of new segment splits segment into two and adds the change route segment to the list
 
             Routes.RemoveRange(currentSegmentIndex - 1, Routes.Count() - currentSegmentIndex - 1); //wyrzuć wszystkie odcinki przed aktualnym oraz aktualny
             Routes.Add(new Segment(Routes[currentSegmentIndex - 1].End, Position)); //stwórz nowy odcinek między końcem ostatniego istniejącego a obecną pozycją samolotu
