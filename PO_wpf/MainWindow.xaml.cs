@@ -29,37 +29,28 @@ namespace PO_wpf
         {
             Map map = new Map();
             Obstacle obs = new Obstacle(0,0,10,10,200);
-            Helicopter heli = new Helicopter();
-            Helicopter heli2 = new Helicopter();
-            Helicopter heli3 = new Helicopter();
-            Helicopter heli4 = new Helicopter();
 
-            //List<Vehicle> vehiclelist = new List<Vehicle>();
             List<VehicleObject> vehicleobjectlist = new List<VehicleObject>();
 
-            heli.Position = new projekt_PO.Point(0, 0);
-            heli.Route.Begin = new projekt_PO.Point(0, 0);
-            heli.Route.End = new projekt_PO.Point(400, 400);
+            Plane a = new Plane();
+            Plane b = new Plane();
 
-            map.Vehicles.Add(heli);
+            a.Position = new projekt_PO.Point(0, 0);
+            Segment A1 = new Segment(new projekt_PO.Point(0, 0), new projekt_PO.Point(200, 200), 100);
+            Segment A2 = new Segment(new projekt_PO.Point(200, 200), new projekt_PO.Point(0, 400), 50);
 
-            heli2.Position = new projekt_PO.Point(400, 0);
-            heli2.Route.Begin = new projekt_PO.Point(400, 0);
-            heli2.Route.End = new projekt_PO.Point(0, 400);
+            a.Routes = new List<Segment> { A1, A2 };
 
-            map.Vehicles.Add(heli2);
+            map.addVehicle(a);
 
-            //heli3.Position = new projekt_PO.Point(200, 0);
-            //heli3.Route.Begin = new projekt_PO.Point(200, 0);
-            //heli3.Route.End = new projekt_PO.Point(400, 400);
+            b.Position = new projekt_PO.Point(200, 0);
+            Segment B1 = new Segment(new projekt_PO.Point(200, 0), new projekt_PO.Point(0, 200), 100);
+            Segment B2 = new Segment(new projekt_PO.Point(0, 200), new projekt_PO.Point(200, 400), 50);
+            b.Routes = new List<Segment> { B1, B2 };
 
-            //map.Vehicles.Add(heli3);
+            Console.WriteLine(b.Routes[0].Begin.X);
 
-            //heli4.Position = new projekt_PO.Point(150, 450);
-            //heli4.Route.Begin = new projekt_PO.Point(150, 450);
-            //heli4.Route.End = new projekt_PO.Point(400, 400);
-
-            //map.Vehicles.Add(heli4);
+            map.addVehicle(b);
 
             InitializeComponent();
 
@@ -74,7 +65,7 @@ namespace PO_wpf
 
             foreach (Vehicle v in map.Vehicles)
             {
-                VehicleObject obj = new VehicleObject(v, AddVehicle(v), AddLine(v));
+                VehicleObject obj = new VehicleObject(v, AddVehicle(v), AddLines(v));
                 vehicleobjectlist.Add(obj);
             }
 
@@ -112,6 +103,9 @@ namespace PO_wpf
                         //obj.Img.Margin = new Thickness(obj.Vhc.Position.X, 0, 0, obj.Vhc.Position.Y);
                         Canvas.SetBottom(obj.Img, obj.Vhc.Position.Y - (obj.Img.Height)/2);
                         Canvas.SetLeft(obj.Img, obj.Vhc.Position.X - (obj.Img.Width)/2);
+
+                        obj.Lines[obj.Vhc.CurrentSegmentIndex].X1 = obj.Vhc.Position.X;
+                        obj.Lines[obj.Vhc.CurrentSegmentIndex].Y1 = Constants.mapSizeY - obj.Vhc.Position.Y;
                     }
                 });
             }
@@ -159,39 +153,45 @@ namespace PO_wpf
             return img;
         }
 
-        public Line AddLine(Vehicle vhc)
+        public List<Line> AddLines(Vehicle vhc)
         {
-            Line line = new Line();
+            List<Line> lines = new List<Line>();
+            foreach (Segment path in vhc.Routes)
+            {
+                Line line = new Line();
 
-            line.Margin = new Thickness(0, 0, 0, 0);
-            //line.HorizontalAlignment = HorizontalAlignment.Left;
-            //line.VerticalAlignment = VerticalAlignment.Bottom;
-            line.StrokeThickness = 1;
-            line.Stroke = System.Windows.Media.Brushes.Gray;
-            line.X1 = vhc.Route.Begin.X;
-            line.X2 = vhc.Route.End.X;
-            line.Y1 = Constants.mapSizeY - vhc.Route.Begin.Y;
-            line.Y2 = Constants.mapSizeY - vhc.Route.End.Y;
+                line.Margin = new Thickness(0, 0, 0, 0);
+                //line.HorizontalAlignment = HorizontalAlignment.Left;
+                //line.VerticalAlignment = VerticalAlignment.Bottom;
+                line.StrokeThickness = 1;
+                line.Stroke = System.Windows.Media.Brushes.Gray;
+                line.X1 = path.Begin.X;
+                line.X2 = path.End.X;
+                line.Y1 = Constants.mapSizeY - path.Begin.Y;
+                line.Y2 = Constants.mapSizeY - path.End.Y;
 
-            MapCanvas.Children.Add(line);
+                MapCanvas.Children.Add(line);
 
-            return line;
+                lines.Add(line);
+            }
+
+            return lines;
         }
     }
 
     public class VehicleObject   //każdy pojazd ma swój odpowiednik na mapie
     {
-        private Line line;
+        private List<Line> lines;
         private Image img;
         private Vehicle vhc;
         private string vehicleType;
 
-        public Line Line
+        public List<Line> Lines
         {
-            get { return line; }
+            get { return lines; }
             private set
             {
-                line = value;
+                lines = value;
             }
         }
         public Image Img
@@ -219,11 +219,11 @@ namespace PO_wpf
             }
         }
 
-        public VehicleObject(Vehicle _vhc, Image _img, Line _line)
+        public VehicleObject(Vehicle _vhc, Image _img, List<Line> _lines)
         {
             vhc = _vhc;
             img = _img;
-            line = _line;
+            lines = _lines;
             vehicleType = _vhc.GetType().Name;
         }
     }
