@@ -15,6 +15,7 @@ namespace projekt_PO
         public const double mapSizeX = 500; //podpiąć do MainWindow.xaml
         public const double mapSizeY = 500;
         public const double startingVehicleHeight = 1000;
+        public const int routesMaxNumberOfSegments = 5;
         public class Plane
         {
             public const double speed = 200;
@@ -40,18 +41,22 @@ namespace projekt_PO
         Ogólnie to w samych zaleceniach projektu na cezie2 jest napisane żeby rozbijac wielkie metody na mniejsze.
         
          Potem po prostu te metody by się podpieło do klasy Map i tyle, chociaz nie wiem czy ta klasa Generator ma sens xD*/
+
+
     {
 
-        private Segment windowTop = new Segment(new Point(0, Constants.mapSizeY), new Point(Constants.mapSizeX, Constants.mapSizeY)); //krawędzie mapy względem dolnego lewego rogu używane do sprawdzania czy generowane trasy nie wykraczają poza mapę
-        private Segment windowBottom = new Segment(new Point(0, 0), new Point(Constants.mapSizeX, 0));
-        private Segment windowLeft = new Segment(new Point(0, 0), new Point(0, Constants.mapSizeY));
-        private Segment windowRight = new Segment(new Point(Constants.mapSizeX, 0), new Point(0, Constants.mapSizeY)); 
+        //private Segment windowTop = new Segment(new Point(0, Constants.mapSizeY), new Point(Constants.mapSizeX, Constants.mapSizeY)); //krawędzie mapy względem dolnego lewego rogu używane do sprawdzania czy generowane trasy nie wykraczają poza mapę
+        //private Segment windowBottom = new Segment(new Point(0, 0), new Point(Constants.mapSizeX, 0));
+        //private Segment windowLeft = new Segment(new Point(0, 0), new Point(0, Constants.mapSizeY));
+        //private Segment windowRight = new Segment(new Point(Constants.mapSizeX, 0), new Point(0, Constants.mapSizeY));
+
+            //powyższe nieużywane, znaleziono inną implementację
 
 
         public List<Segment> generateRoutes(int routeLengthInSegments, Vehicle vehicle)
         {
             List<Segment> generatedRoutes = new List<Segment>();
-            Random numberGenerator = new Random();
+            Random numberGenerator = new Random(Guid.NewGuid().GetHashCode());
             Point lastSegmentsEnd = new Point();
 
 
@@ -108,11 +113,11 @@ namespace projekt_PO
             return generatedRoutes;
         }
 
-        public List<Vehicle> generateVehicles(int numberOfVehicles, Map _map)
+        public List<Vehicle> generateVehicles(int numberOfVehicles)
         {
             List<Vehicle> generatedVehicles = new List<Vehicle>();
-            Vehicle generatedVehicle;
-            Random numberGenerator = new Random();
+            Vehicle generatedVehicle = new Vehicle();
+            Random numberGenerator = new Random(Guid.NewGuid().GetHashCode());
 
             for (int i = 0; i < numberOfVehicles; i++)
             {
@@ -123,7 +128,12 @@ namespace projekt_PO
                 else if (aircraftPickerRandom == 2) generatedVehicle = new Plane();
                 else if (aircraftPickerRandom == 3) generatedVehicle = new Balloon();
 
+                generatedVehicle.Routes = generateRoutes((numberGenerator.Next() % Constants.routesMaxNumberOfSegments)+1, generatedVehicle);
+                //generatedVehicle.Position ustawione przez generateRoutes, speed oraz height też
 
+                generatedVehicle.CurrentSegmentIndex = 0;
+
+                generatedVehicles.Add(generatedVehicle);
             }
             return generatedVehicles;
         }
@@ -150,8 +160,8 @@ namespace projekt_PO
         }
 
 
-        public List<Vehicle> Vehicles { get => vehicles; } //klasa Vehicle jest później w kodzie
-        public List<Obstacle> Obstacles { get => obstacles; }
+        public List<Vehicle> Vehicles { get => vehicles; set => vehicles = value; } //klasa Vehicle jest później w kodzie
+        public List<Obstacle> Obstacles { get => obstacles; set => obstacles = value; }
 
         public void generate() { } //wygeneruj świat (samoloty i przeszkody)
         public void addVehicle(Vehicle _vehicle)

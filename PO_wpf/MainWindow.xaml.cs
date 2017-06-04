@@ -38,7 +38,8 @@ namespace PO_wpf
 
             a.Position = new projekt_PO.Point(0, 0);
 
-            a.Routes = generator.generateRoutes(3, a);
+            a.Routes = generator.generateRoutes(3, a); //<------wygenerowana trasa
+            map.Vehicles.AddRange(generator.generateVehicles(7)); //<---- tutaj można zmienić ilość pojazdów które są generowane
 
             map.addVehicle(a);
 
