@@ -27,25 +27,25 @@ namespace PO_wpf
         //public Random random = new Random();
         public MainWindow()
         {
+            Generator generator = new Generator();
             Map map = new Map();
             Obstacle obs = new Obstacle(0,0,10,10,200);
 
             List<VehicleObject> vehicleobjectlist = new List<VehicleObject>();
 
-            Plane a = new Plane();
+            Helicopter a = new Helicopter();
             Plane b = new Plane();
 
             a.Position = new projekt_PO.Point(0, 0);
-            Segment A1 = new Segment(new projekt_PO.Point(0, 0), new projekt_PO.Point(200, 200), 100);
-            Segment A2 = new Segment(new projekt_PO.Point(200, 200), new projekt_PO.Point(0, 400), 50);
 
-            a.Routes = new List<Segment> { A1, A2 };
+            a.Routes = generator.generateRoutes(3, a); //<------wygenerowana trasa
+            map.Vehicles.AddRange(generator.generateVehicles(7)); //<---- tutaj można zmienić ilość pojazdów które są generowane
 
             map.addVehicle(a);
 
             b.Position = new projekt_PO.Point(200, 0);
-            Segment B1 = new Segment(new projekt_PO.Point(200, 0), new projekt_PO.Point(0, 200), 100);
-            Segment B2 = new Segment(new projekt_PO.Point(0, 200), new projekt_PO.Point(200, 400), 50);
+            Segment B1 = new Segment(new projekt_PO.Point(200, 0), new projekt_PO.Point(0, 200), 100, 500);
+            Segment B2 = new Segment(new projekt_PO.Point(0, 200), new projekt_PO.Point(200, 400), 50, 500);
             b.Routes = new List<Segment> { B1, B2 };
 
             Console.WriteLine(b.Routes[0].Begin.X);
