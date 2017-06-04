@@ -15,10 +15,12 @@
                         <GridView.Columns>
                             <GridViewColumn Header="Type" 
                             DisplayMemberBinding="{Binding VehicleType}" />
-                            <GridViewColumn Header="X" Width="50"
+                            <GridViewColumn Header="X" Width="40"
                             DisplayMemberBinding="{Binding Vhc.Position.X}" />
-                            <GridViewColumn Header="Y" Width="50"
+                            <GridViewColumn Header="Y" Width="40"
                             DisplayMemberBinding="{Binding Vhc.Position.Y}" />
+                            <GridViewColumn Header="Z" Width="40"
+                            DisplayMemberBinding="{Binding Vhc.Routes[Vhc.CurrentSegmentIndex].Height}" />
                         </GridView.Columns>
                     </GridView>
                 </ListView.View>
@@ -51,7 +53,7 @@
         <ToggleButton Name="StartControl" Content="Run Simulation Normally" HorizontalAlignment="Left" Margin="10,467,0,0" VerticalAlignment="Top" Width="Auto"/>
         <Button Name="StepControl" Content="Step" HorizontalAlignment="Left" Margin="10,492,0,0" VerticalAlignment="Top" Width="75"/>
         <Grid Name="ProximitiesListGrid" HorizontalAlignment="Left" MaxHeight="200" MinHeight="50" Height="Auto" Margin="240,226,0,0" VerticalAlignment="Top" Width="205">
-            <ListView Name="ProximitiesList">
+            <ListView Name="ProximitiesList" SelectionChanged="ProximitiesList_SelectionChanged" SelectionMode="Multiple">
                 <ListView.View>
                     <GridView AllowsColumnReorder="True">
                         <GridView.Columns>

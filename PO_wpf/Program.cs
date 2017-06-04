@@ -21,7 +21,7 @@ namespace projekt_PO
         public const double mapSizeY = 500;
         public const double startingVehicleHeight = 0;  //Wartości poczatkowej wysokosci są skonfigurowane aby zawierać się w granicy [startingVehicleHeight/2, startingVehicleHeight*2]. Zatem samoloty są generowane w taki sposób, że ich wysokość początkowa (w zerowej klatce) zawiera się w tej granicy
         public const int routesMaxNumberOfSegments = 5; //Maksymalna ilość odcinków z której składa się trasa generowanych poj. latających
-        public const int proximityWarningThreshold = 50; //Jeżeli odległosć między dwoma poj. latającymi albo poj. latającym i przeszkodą jest mniejsza niż ta, to wysyłane jest ostrzeżenie o zbliżeniu
+        public const int proximityWarningThreshold = 100; //Jeżeli odległosć między dwoma poj. latającymi albo poj. latającym i przeszkodą jest mniejsza niż ta, to wysyłane jest ostrzeżenie o zbliżeniu
         public static int colisionThreshold = 5; //Jeżeli odległość między dwoma poj. latającymi albo poj. latającym i przeszkodą w następnej klatce będzie wynosić mniej niż wartość tu podana, to program traktuje takie zbliżenie jako kolizję - program jest pauzowany.
         public static double routeMinLength = 20;
         public static double routeMaxLength = 300;

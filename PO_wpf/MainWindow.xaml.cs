@@ -37,7 +37,6 @@ namespace PO_wpf
         {
             Generator generator = new Generator();
             Map map = new Map();
-            Obstacle obs = new Obstacle(0,0,10,10,200);
 
             Helicopter a = new Helicopter();
             Plane b = new Plane();
@@ -45,7 +44,7 @@ namespace PO_wpf
             a.Position = new projekt_PO.Point(0, 0);
 
             //a.Routes = generator.generateRoutes(3, a); //<------wygenerowana trasa
-            map.Vehicles.AddRange(generator.generateVehicles(5)); //<---- tutaj można zmienić ilość pojazdów które są generowane
+            //map.Vehicles.AddRange(generator.generateVehicles(5)); //<---- tutaj można zmienić ilość pojazdów które są generowane
 
             a.Position = new projekt_PO.Point(0, 0);
             Segment A1 = new Segment(new projekt_PO.Point(0, 0), new projekt_PO.Point(400, 400), 100, 500);
@@ -72,13 +71,17 @@ namespace PO_wpf
             MapCanvas.Width = Constants.mapSizeY;       
             MapCanvas.Height = Constants.mapSizeX;
 
-            Image obsimg = AddObstacle(obs);
-
             foreach (Vehicle v in map.Vehicles)
             {
                 VehicleObject obj = new VehicleObject(v, AddVehicle(v), AddLines(v), AddBorder(v));
                 vehicleobjectlist.Add(obj);
             }
+
+            Obstacle obs = new Obstacle(250, 250, 10, 10, 1000);
+
+            map.Obstacles.Add(obs);
+
+            Image obsimg = AddObstacle(obs);
 
             VehicleList.ItemsSource = vehicleobjectlist;
 
@@ -89,8 +92,6 @@ namespace PO_wpf
             ProximitiesList.ItemsSource = map.Proximities;
 
             StartAsyncProcess(map, vehicleobjectlist);
-
-            
         }
 
         private async void StartAsyncProcess(Map map, List<VehicleObject> list)           //metoda asynchroniczna
@@ -284,6 +285,26 @@ namespace PO_wpf
             {
                 vhco1.Lines[0].Stroke = System.Windows.Media.Brushes.Red;
                 vhco2.Lines[0].Stroke = System.Windows.Media.Brushes.Red;
+            }
+        }
+
+        private void ProximitiesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ProximitiesList.SelectedIndex == -1) return;
+
+            Collision coll = ProximitiesList.SelectedItems[0] as Collision;
+            VehicleObject vhco1 = vehicleobjectlist.First(x => x.Vhc == coll.Vhc);
+            VehicleObject vhco2 = vehicleobjectlist.First(x => x.Vhc.Position == coll.Obs.Position);
+            if (ProximitiesList.SelectedItems.Count > 1)
+            {
+                vhco1.Lines[0].Stroke = System.Windows.Media.Brushes.Gray;
+                vhco2.Lines[0].Stroke = System.Windows.Media.Brushes.Gray;
+                ProximitiesList.SelectedItems.Remove(coll);
+            }
+            else
+            {
+                vhco1.Lines[0].Stroke = System.Windows.Media.Brushes.Orange;
+                vhco2.Lines[0].Stroke = System.Windows.Media.Brushes.Orange;
             }
         }
     }
