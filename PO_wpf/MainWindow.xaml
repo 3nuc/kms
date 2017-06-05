@@ -20,7 +20,7 @@
                             <GridViewColumn Header="Y" Width="40"
                             DisplayMemberBinding="{Binding Vhc.Position.Y}" />
                             <GridViewColumn Header="Z" Width="40"
-                            DisplayMemberBinding="{Binding Vhc.Routes[Vhc.CurrentSegmentIndex].Height}" />
+                            DisplayMemberBinding="{Binding Vhc.Height}" />
                         </GridView.Columns>
                     </GridView>
                 </ListView.View>
@@ -72,5 +72,7 @@
         </Grid>
         <TextBlock HorizontalAlignment="Left" Margin="10,205,0,0" TextWrapping="Wrap" Text="Kolizje:" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="240,205,0,0" TextWrapping="Wrap" Text="Zbliżenia:" VerticalAlignment="Top"/>
+        <Button Name="DialogButton" Content="Choose File" HorizontalAlignment="Left" Margin="240,22,0,0" VerticalAlignment="Top" Width="75" Click="DialogButton_Click"/>
+        <Button Name="LoadAllEntities" Content="Load All Entities" HorizontalAlignment="Left" Margin="320,22,0,0" VerticalAlignment="Top" Width="90" Click="LoadAllEntities_Click"/>
     </Grid>
 </Window>
