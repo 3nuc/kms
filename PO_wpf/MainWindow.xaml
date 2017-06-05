@@ -74,5 +74,6 @@
         <TextBlock HorizontalAlignment="Left" Margin="240,205,0,0" TextWrapping="Wrap" Text="Zbliżenia:" VerticalAlignment="Top"/>
         <Button Name="DialogButton" Content="Choose File" HorizontalAlignment="Left" Margin="240,22,0,0" VerticalAlignment="Top" Width="75" Click="DialogButton_Click"/>
         <Button Name="LoadAllEntities" Content="Load All Entities" HorizontalAlignment="Left" Margin="320,22,0,0" VerticalAlignment="Top" Width="90" Click="LoadAllEntities_Click"/>
+        <Button Name="ChangeRouteButton" Content="Change Selected Route" HorizontalAlignment="Left" Margin="151,467,0,0" VerticalAlignment="Top" Width="130" Height="20" Click="ChangeRouteButton_Click"/>
     </Grid>
 </Window>

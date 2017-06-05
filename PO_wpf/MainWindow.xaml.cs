@@ -16,8 +16,6 @@ using System.Windows.Shapes;
 using projekt_PO;
 using System.ComponentModel;
 
-// DODAJ WYSOKOSC DO TABELKI W XAML
-
 namespace PO_wpf
 {
     /// <summary>
@@ -31,6 +29,7 @@ namespace PO_wpf
     }
     public partial class MainWindow : Window
     {
+        MainWindow mainwindow;
         List<VehicleObject> vehicleobjectlist = new List<VehicleObject>();
         public string IMG = WindowConstanst.PlaceholderIMG;
         public string MapPath = "";
@@ -38,6 +37,7 @@ namespace PO_wpf
         //public Random random = new Random();
         public MainWindow()
         {
+            mainwindow = this;
             Generator generator = new Generator();
 
             Helicopter a = new Helicopter();
@@ -112,6 +112,14 @@ namespace PO_wpf
         {
             while (true)
             {
+                //await Task.Run(() =>
+                //{
+                //    while (map.Collisions.Count != 0)
+                //    {
+                //        Task.Delay(10).Wait();
+                //    }
+                //});
+
                 if (this.Dispatcher.Invoke(() => (bool)StartControl.IsChecked))
                 {
                     Task.Delay(1000).Wait();    //gdy przycisk do normalnej symulacji jest wcisnięty, działaj normalnie
@@ -123,7 +131,7 @@ namespace PO_wpf
                         Task.Delay(250).Wait();
                         while ( (this.Dispatcher.Invoke(() => StepControl.IsPressed)) == false )
                         {
-                            //pusty while czeka na przyciśnięcie przycisku
+                            Task.Delay(10).Wait();
                         }
                     });
                 }
@@ -152,6 +160,7 @@ namespace PO_wpf
                         obj.Lines[0].Stroke = System.Windows.Media.Brushes.Gray;
                         if (obj.Vhc.CurrentSegmentIndex > obj.CurrentLineIndex)
                         {
+                            MapCanvas.Children.Remove(obj.Lines[0]);
                             obj.Lines.RemoveAt(0);
                             obj.CurrentLineIndex++;
                         }
@@ -335,6 +344,13 @@ namespace PO_wpf
         {
             LoadALL();
         }
+
+        private void ChangeRouteButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CollisionsList.SelectedIndex == -1) return; //WYJATEK IF TIME
+            Window1 window = new Window1(vehicleobjectlist, map, CollisionsList.SelectedItems[0] as Collision, mainwindow);
+            window.Show();
+        }
     }
 
     public class VehicleObject   //każdy pojazd ma swój odpowiednik na mapie
@@ -359,7 +375,7 @@ namespace PO_wpf
         public List<Line> Lines
         {
             get { return lines; }
-            private set
+            set
             {
                 lines = value;
             }
