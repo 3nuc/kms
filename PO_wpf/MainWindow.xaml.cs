@@ -27,16 +27,18 @@ namespace PO_wpf
     public static class WindowConstanst
     {
         public const double VehilceImageSize = 5;
+        public const string PlaceholderIMG = "pack://application:,,,/img/placeholder.bmp";
     }
     public partial class MainWindow : Window
     {
         List<VehicleObject> vehicleobjectlist = new List<VehicleObject>();
-        public const string IMG = "pack://application:,,,/img/placeholder.bmp";
+        public string IMG = WindowConstanst.PlaceholderIMG;
+        public string MapPath = "";
+        Map map = new Map();
         //public Random random = new Random();
         public MainWindow()
         {
             Generator generator = new Generator();
-            Map map = new Map();
 
             Helicopter a = new Helicopter();
             Plane b = new Plane();
@@ -55,14 +57,12 @@ namespace PO_wpf
 
             b.Position = new projekt_PO.Point(200, 0);
             Segment B1 = new Segment(new projekt_PO.Point(200, 0), new projekt_PO.Point(0, 200), 100, 0);
-            Segment B2 = new Segment(new projekt_PO.Point(0, 200), new projekt_PO.Point(200, 400), 50, 0);
+            Segment B2 = new Segment(new projekt_PO.Point(0, 200), new projekt_PO.Point(200, 400), 50, 500);
             b.Routes = new List<Segment> { B1, B2 };
 
             Console.WriteLine(b.Routes[0].Begin.X);
 
             map.addVehicle(b);
-
-            map.loadObstaclesFromFile(@"D:\\dev16k\\kms\\PO_wpf\\obst.txt"); //zmień se path
 
             InitializeComponent();
 
@@ -73,17 +73,11 @@ namespace PO_wpf
             MapCanvas.Width = Constants.mapSizeY;       
             MapCanvas.Height = Constants.mapSizeX;
 
-            foreach (Vehicle v in map.Vehicles)
-            {
-                VehicleObject obj = new VehicleObject(v, AddVehicle(v), AddLines(v), AddBorder(v));
-                vehicleobjectlist.Add(obj);
-            }
-
             Obstacle obs = new Obstacle(250, 250, 10, 10, 1000);
 
             map.Obstacles.Add(obs);
 
-            Image obsimg = AddObstacle(obs);
+            //LoadALL();
 
             VehicleList.ItemsSource = vehicleobjectlist;
 
@@ -94,6 +88,19 @@ namespace PO_wpf
             ProximitiesList.ItemsSource = map.Proximities;
 
             StartAsyncProcess(map, vehicleobjectlist);
+        }
+
+        private void LoadALL()
+        {
+            foreach (Vehicle v in map.Vehicles)
+            {
+                VehicleObject obj = new VehicleObject(v, AddVehicle(v), AddLines(v), AddBorder(v));
+                vehicleobjectlist.Add(obj);
+            }
+            foreach (Obstacle o in map.Obstacles)
+            {
+                AddObstacle(o);
+            }
         }
 
         private async void StartAsyncProcess(Map map, List<VehicleObject> list)           //metoda asynchroniczna
@@ -308,6 +315,25 @@ namespace PO_wpf
                 vhco1.Lines[0].Stroke = System.Windows.Media.Brushes.Orange;
                 vhco2.Lines[0].Stroke = System.Windows.Media.Brushes.Orange;
             }
+        }
+
+        private void DialogButton_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.DefaultExt = ".txt";
+
+            bool? result = dlg.ShowDialog();
+
+            if (result.HasValue && result.Value)
+            {
+                MapPath = dlg.FileName;
+                map.loadObstaclesFromFile(@MapPath);
+            }
+        }
+
+        private void LoadAllEntities_Click(object sender, RoutedEventArgs e)
+        {
+            LoadALL();
         }
     }
 
