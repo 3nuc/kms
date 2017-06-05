@@ -263,35 +263,36 @@ namespace projekt_PO
             {
                 numberOfSegments.Add(Int32.Parse(line[i + 2]));
             }
-            for (int i = 1; i < numberOfVehicles+1; i++)
+            for (int i = 1; i < numberOfVehicles + 1; i++)
             {
                 Vehicle currentVehicle;
                 line = data[i].Split(null);
                 currentVehicle = typeDecipherer(Char.Parse(line[0]));
-                for (int j = 1;j < numberOfSegments[i-1]*5+1; j+=6) //punkt poczatkowy, koncowy, predkosc, wysokosc
+                currentVehicle.Position = new Point(Double.Parse(line[1]), Double.Parse(line[2]));
+                for (int j = 1; j < numberOfSegments[i - 1] * 5 + 1; j += 6) //punkt poczatkowy, koncowy, predkosc, wysokosc
                 {
-                    Console.WriteLine(i + " " +  j + " " + numberOfSegments[i-1]*5);
-                    Segment currentSegment = new Segment(Double.Parse(line[j]), Double.Parse(line[j+1]), Double.Parse(line[j + 2]), Double.Parse(line[j + 3]), Double.Parse(line[j + 4]), Double.Parse(line[j+5]));
+                    Console.WriteLine(i + " " + j + " " + numberOfSegments[i - 1] * 5);
+                    Segment currentSegment = new Segment(Double.Parse(line[j]), Double.Parse(line[j + 1]), Double.Parse(line[j + 2]), Double.Parse(line[j + 3]), Double.Parse(line[j + 4]), Double.Parse(line[j + 5]));
                     currentVehicle.Routes.Add(currentSegment);
                 }
                 vehicles.Add(currentVehicle);
             }
-            for (int i = numberOfVehicles+1; i < numberOfVehicles+numberOfObstacles+1; i++) 
+            for (int i = numberOfVehicles + 1; i < numberOfVehicles + numberOfObstacles + 1; i++)
             {
                 line = data[i].Split(null); //poz x, poz y, szerokosc, dlugosc, wysokosc
                 foreach (var item in line)
                 {
-                    Console.WriteLine(item); 
+                    Console.WriteLine(item);
                 }
 
-                Console.WriteLine("I: " +i);
+                Console.WriteLine("I: " + i);
 
                 Obstacle currentObstacle = new Obstacle(Double.Parse(line[0]), Double.Parse(line[1]), Double.Parse(line[2]), Double.Parse(line[3]), Double.Parse(line[4]));
 
                 obstacles.Add(currentObstacle);
             }
 
-            
+
 
             return true;
         }
@@ -373,6 +374,16 @@ namespace projekt_PO
                 foreach (Obstacle obs in list)
                 {
                     colls.Add(new Collision(vhc, obs));
+                }
+            }
+
+            foreach (Obstacle obst in obstacles)
+            {
+                List<Obstacle> list = obst.detectCollisions(map);
+
+                foreach (Vehicle vehobst in list)
+                {
+                    colls.Add(new Collision(vehobst, obst));
                 }
             }
 
