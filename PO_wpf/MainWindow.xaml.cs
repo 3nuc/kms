@@ -292,17 +292,17 @@ namespace PO_wpf
 
             Collision coll = CollisionsList.SelectedItems[0] as Collision;
             VehicleObject vhco1 = vehicleobjectlist.First(x => x.Vhc == coll.Vhc);
-            VehicleObject vhco2 = vehicleobjectlist.First(x => x.Vhc.Position == coll.Obs.Position);
+            VehicleObject vhco2 = vehicleobjectlist.FirstOrDefault(x => x.Vhc.Position == coll.Obs.Position);
             if (CollisionsList.SelectedItems.Count > 1)
             {
                 vhco1.Lines[0].Stroke = System.Windows.Media.Brushes.Gray;
-                vhco2.Lines[0].Stroke = System.Windows.Media.Brushes.Gray;
+                if (vhco2 != null) vhco2.Lines[0].Stroke = System.Windows.Media.Brushes.Gray;
                 CollisionsList.SelectedItems.Remove(coll);
             }
             else
             {
                 vhco1.Lines[0].Stroke = System.Windows.Media.Brushes.Red;
-                vhco2.Lines[0].Stroke = System.Windows.Media.Brushes.Red;
+                if (vhco2 != null) vhco2.Lines[0].Stroke = System.Windows.Media.Brushes.Red;
             }
         }
 
@@ -412,6 +412,17 @@ namespace PO_wpf
             lines = _lines;
             vehicleType = _vhc.GetType().Name;
             brdr = _brdr;
+        }
+
+        public VehicleObject(Obstacle obs)      //niby vehicleobject dla obstacle
+        {
+            Vehicle fakevhc = new Vehicle();
+            fakevhc.Position.X = obs.Position.X;
+            fakevhc.Position.Y = obs.Position.Y;
+            fakevhc.Height = obs.Height;
+            fakevhc.Routes.Add(new Segment(0, 0, 0, 0));
+            vehicleType = "Obstacle";
+            vhc = fakevhc;
         }
     }
 }

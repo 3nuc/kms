@@ -36,7 +36,14 @@ namespace PO_wpf
             map = mp;
 
             vhco1 = vhcobjlist.First(x => x.Vhc == coll.Vhc);
-            vhco2 = vhcobjlist.First(x => x.Vhc.Position == coll.Obs.Position);
+            vhco2 = vhcobjlist.FirstOrDefault(x => x.Vhc.Position == coll.Obs.Position);
+            if (vhco2 == null)
+            {
+                vhco2 = new VehicleObject(coll.Obs);
+                X8.IsReadOnly = true;
+                Y8.IsReadOnly = true;
+                Z8.IsReadOnly = true;
+            }
 
             v1Type.Text = vhco1.VehicleType;
             v2Type.Text = vhco2.VehicleType;
@@ -172,30 +179,31 @@ namespace PO_wpf
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            vhco1.Lines[vhco1.CurrentLineIndex].Stroke = System.Windows.Media.Brushes.Gray;
-            vhco2.Lines[vhco2.CurrentLineIndex].Stroke = System.Windows.Media.Brushes.Gray;
+            vhco1.Lines[0].Stroke = System.Windows.Media.Brushes.Gray;
+            if(vhco2.VehicleType != "Obstacle")vhco2.Lines[0].Stroke = System.Windows.Media.Brushes.Gray;
 
             List<Segment> newRoutes = new List<Segment>();
             vhco1.CurrentLineIndex = 0;
             vhco2.CurrentLineIndex = 0;
             //vhco1.Vhc.CurrentSegmentIndex = 0;
 
-            newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X1.Text), Double.Parse(Y1.Text)), new projekt_PO.Point(Double.Parse(X2.Text), Double.Parse(Y2.Text)), vhco1.Vhc.Routes[vhco1.Vhc.CurrentSegmentIndex].Speed, Double.Parse(Z2.Text)));
+            //błędy z kilkoma ścieżkami, występuje "X" w dobrych odcinkach
+            newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X1.Text), Double.Parse(Y1.Text)), new projekt_PO.Point(Double.Parse(X2.Text), Double.Parse(Y2.Text)), vhco1.Vhc.Routes[0].Speed, Double.Parse(Z2.Text)));
             if (X3.Text != "X")
             {
-                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X2.Text), Double.Parse(Y2.Text)), new projekt_PO.Point(Double.Parse(X3.Text), Double.Parse(Y3.Text)), vhco1.Vhc.Routes[vhco1.Vhc.CurrentSegmentIndex+1].Speed, Double.Parse(Z3.Text)));
+                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X2.Text), Double.Parse(Y2.Text)), new projekt_PO.Point(Double.Parse(X3.Text), Double.Parse(Y3.Text)), vhco1.Vhc.Routes[1].Speed, Double.Parse(Z3.Text)));
             }
             if (X4.Text != "X")
             {
-                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X3.Text), Double.Parse(Y3.Text)), new projekt_PO.Point(Double.Parse(X4.Text), Double.Parse(Y4.Text)), vhco1.Vhc.Routes[vhco1.Vhc.CurrentSegmentIndex+2].Speed, Double.Parse(Z4.Text)));
+                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X3.Text), Double.Parse(Y3.Text)), new projekt_PO.Point(Double.Parse(X4.Text), Double.Parse(Y4.Text)), vhco1.Vhc.Routes[2].Speed, Double.Parse(Z4.Text)));
             }
             if (X5.Text != "X")
             {
-                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X4.Text), Double.Parse(Y4.Text)), new projekt_PO.Point(Double.Parse(X5.Text), Double.Parse(Y5.Text)), vhco1.Vhc.Routes[vhco1.Vhc.CurrentSegmentIndex+3].Speed, Double.Parse(Z5.Text)));
+                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X4.Text), Double.Parse(Y4.Text)), new projekt_PO.Point(Double.Parse(X5.Text), Double.Parse(Y5.Text)), vhco1.Vhc.Routes[3].Speed, Double.Parse(Z5.Text)));
             }
             if (X6.Text != "X")
             {
-                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X5.Text), Double.Parse(Y5.Text)), new projekt_PO.Point(Double.Parse(X6.Text), Double.Parse(Y6.Text)), vhco1.Vhc.Routes[vhco1.Vhc.CurrentSegmentIndex+4].Speed, Double.Parse(Z6.Text)));
+                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X5.Text), Double.Parse(Y5.Text)), new projekt_PO.Point(Double.Parse(X6.Text), Double.Parse(Y6.Text)), vhco1.Vhc.Routes[4].Speed, Double.Parse(Z6.Text)));
             }
 
             vhco1.Vhc.Routes = newRoutes;
@@ -218,22 +226,22 @@ namespace PO_wpf
             //VHCO2
             newRoutes = new List<Segment>();
 
-            newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X7.Text), Double.Parse(Y7.Text)), new projekt_PO.Point(Double.Parse(X8.Text), Double.Parse(Y8.Text)), vhco2.Vhc.Routes[vhco2.Vhc.CurrentSegmentIndex].Speed, Double.Parse(Z8.Text)));
+            newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X7.Text), Double.Parse(Y7.Text)), new projekt_PO.Point(Double.Parse(X8.Text), Double.Parse(Y8.Text)), vhco2.Vhc.Routes[0].Speed, Double.Parse(Z8.Text)));
             if (X9.Text != "X")
             {
-                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X8.Text), Double.Parse(Y8.Text)), new projekt_PO.Point(Double.Parse(X9.Text), Double.Parse(Y9.Text)), vhco2.Vhc.Routes[vhco2.Vhc.CurrentSegmentIndex + 1].Speed, Double.Parse(Z9.Text)));
+                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X8.Text), Double.Parse(Y8.Text)), new projekt_PO.Point(Double.Parse(X9.Text), Double.Parse(Y9.Text)), vhco2.Vhc.Routes[1].Speed, Double.Parse(Z9.Text)));
             }
             if (X10.Text != "X")
             {
-                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X9.Text), Double.Parse(Y9.Text)), new projekt_PO.Point(Double.Parse(X10.Text), Double.Parse(Y10.Text)), vhco2.Vhc.Routes[vhco2.Vhc.CurrentSegmentIndex + 2].Speed, Double.Parse(Z10.Text)));
+                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X9.Text), Double.Parse(Y9.Text)), new projekt_PO.Point(Double.Parse(X10.Text), Double.Parse(Y10.Text)), vhco2.Vhc.Routes[2].Speed, Double.Parse(Z10.Text)));
             }
             if (X11.Text != "X")
             {
-                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X10.Text), Double.Parse(Y10.Text)), new projekt_PO.Point(Double.Parse(X11.Text), Double.Parse(Y11.Text)), vhco2.Vhc.Routes[vhco2.Vhc.CurrentSegmentIndex + 3].Speed, Double.Parse(Z11.Text)));
+                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X10.Text), Double.Parse(Y10.Text)), new projekt_PO.Point(Double.Parse(X11.Text), Double.Parse(Y11.Text)), vhco2.Vhc.Routes[3].Speed, Double.Parse(Z11.Text)));
             }
             if (X12.Text != "X")
             {
-                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X11.Text), Double.Parse(Y11.Text)), new projekt_PO.Point(Double.Parse(X12.Text), Double.Parse(Y12.Text)), vhco2.Vhc.Routes[vhco2.Vhc.CurrentSegmentIndex + 4].Speed, Double.Parse(Z12.Text)));
+                newRoutes.Add(new Segment(new projekt_PO.Point(Double.Parse(X11.Text), Double.Parse(Y11.Text)), new projekt_PO.Point(Double.Parse(X12.Text), Double.Parse(Y12.Text)), vhco2.Vhc.Routes[4].Speed, Double.Parse(Z12.Text)));
             }
 
             vhco2.Vhc.Routes = newRoutes;
