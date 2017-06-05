@@ -1,0 +1,95 @@
+﻿<Window x:Class="PO_wpf.Window1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PO_wpf"
+        mc:Ignorable="d"
+        Title="Window1" Height="300" Width="410" ResizeMode="NoResize">
+    <Grid>
+        <!-- <Line Stroke="Black" StrokeThickness="1" X1="1" X2="1" Y1="0" Y2="300" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="191,0,211,-29"/> -->
+        <Grid Margin="0,0,146,0">
+            <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Vehicle 1:" VerticalAlignment="Top"/>
+            <TextBlock Name="v1Type" HorizontalAlignment="Left" Margin="65,10,0,0" TextWrapping="Wrap" Text="_type" VerticalAlignment="Top"/>
+            <Grid>
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Current" VerticalAlignment="Top" Margin="9,57,0,0"/>
+                <TextBox Name="X1" HorizontalAlignment="Left" Height="19" Margin="63,56,0,0" TextWrapping="Wrap" Text="X" VerticalAlignment="Top" Width="30" IsReadOnly="True"/>
+                <TextBox Name="Y1" HorizontalAlignment="Left" Height="19" Margin="98,56,0,0" TextWrapping="Wrap" Text="Y" VerticalAlignment="Top" Width="30" IsReadOnly="True"/>
+                <TextBox Name="Z1" HorizontalAlignment="Left" Height="19" Margin="133,56,0,0" TextWrapping="Wrap" Text="Z" VerticalAlignment="Top" Width="30" IsReadOnly="True"/>
+            </Grid>
+            <Grid>
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next" VerticalAlignment="Top" Margin="9,81,0,0"/>
+                <TextBox Name="X2" HorizontalAlignment="Left" Height="19" Margin="63,80,0,0" TextWrapping="Wrap" Text="X" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Y2" HorizontalAlignment="Left" Height="19" Margin="98,80,0,0" TextWrapping="Wrap" Text="Y" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Z2" HorizontalAlignment="Left" Height="19" Margin="133,80,0,0" TextWrapping="Wrap" Text="Z" VerticalAlignment="Top" Width="30"/>
+            </Grid>
+            <Grid>
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next" VerticalAlignment="Top" Margin="9,105,0,0"/>
+                <TextBox Name="X3" HorizontalAlignment="Left" Height="19" Margin="63,104,0,0" TextWrapping="Wrap" Text="X" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Y3" HorizontalAlignment="Left" Height="19" Margin="98,104,0,0" TextWrapping="Wrap" Text="Y" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Z3" HorizontalAlignment="Left" Height="19" Margin="133,104,0,0" TextWrapping="Wrap" Text="Z" VerticalAlignment="Top" Width="30"/>
+            </Grid>
+            <Grid>
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next" VerticalAlignment="Top" Margin="9,129,0,0"/>
+                <TextBox Name="X4" HorizontalAlignment="Left" Height="19" Margin="63,128,0,0" TextWrapping="Wrap" Text="X" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Y4" HorizontalAlignment="Left" Height="19" Margin="98,128,0,0" TextWrapping="Wrap" Text="Y" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Z4" HorizontalAlignment="Left" Height="19" Margin="133,128,0,0" TextWrapping="Wrap" Text="Z" VerticalAlignment="Top" Width="30"/>
+            </Grid>
+            <Grid>
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next" VerticalAlignment="Top" Margin="9,153,0,0"/>
+                <TextBox Name="X5" HorizontalAlignment="Left" Height="19" Margin="63,152,0,0" TextWrapping="Wrap" Text="X" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Y5" HorizontalAlignment="Left" Height="19" Margin="98,152,0,0" TextWrapping="Wrap" Text="Y" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Z5" HorizontalAlignment="Left" Height="19" Margin="133,152,0,0" TextWrapping="Wrap" Text="Z" VerticalAlignment="Top" Width="30"/>
+            </Grid>
+            <Grid>
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next" VerticalAlignment="Top" Margin="9,177,0,0"/>
+                <TextBox Name="X6" HorizontalAlignment="Left" Height="19" Margin="63,176,0,0" TextWrapping="Wrap" Text="X" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Y6" HorizontalAlignment="Left" Height="19" Margin="98,176,0,0" TextWrapping="Wrap" Text="Y" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Z6" HorizontalAlignment="Left" Height="19" Margin="133,176,0,0" TextWrapping="Wrap" Text="Z" VerticalAlignment="Top" Width="30"/>
+            </Grid>
+        </Grid>
+        <Grid HorizontalAlignment="Right" Margin="0,0,61,0">
+            <TextBlock HorizontalAlignment="Left" Margin="157,10,0,0" TextWrapping="Wrap" Text="Vehicle 2:" VerticalAlignment="Top"/>
+            <TextBlock Name="v2Type" HorizontalAlignment="Left" Margin="212,10,0,0" TextWrapping="Wrap" Text="_type" VerticalAlignment="Top"/>
+            <Grid>
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Current" VerticalAlignment="Top" Margin="155,57,0,0"/>
+                <TextBox Name="X7" HorizontalAlignment="Left" Height="19" Margin="209,56,0,0" TextWrapping="Wrap" Text="X" VerticalAlignment="Top" Width="30" IsReadOnly="True"/>
+                <TextBox Name="Y7" HorizontalAlignment="Left" Height="19" Margin="244,56,0,0" TextWrapping="Wrap" Text="Y" VerticalAlignment="Top" Width="30" IsReadOnly="True"/>
+                <TextBox Name="Z7" HorizontalAlignment="Left" Height="19" Margin="279,56,-16,0" TextWrapping="Wrap" Text="Z" VerticalAlignment="Top" Width="30" IsReadOnly="True"/>
+            </Grid>
+            <Grid>
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next" VerticalAlignment="Top" Margin="155,81,0,0"/>
+                <TextBox Name="X8" HorizontalAlignment="Left" Height="19" Margin="209,80,0,0" TextWrapping="Wrap" Text="X" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Y8" HorizontalAlignment="Left" Height="19" Margin="244,80,0,0" TextWrapping="Wrap" Text="Y" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Z8" HorizontalAlignment="Left" Height="19" Margin="279,80,-16,0" TextWrapping="Wrap" Text="Z" VerticalAlignment="Top" Width="30"/>
+            </Grid>
+            <Grid>
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next" VerticalAlignment="Top" Margin="155,105,0,0"/>
+                <TextBox Name="X9" HorizontalAlignment="Left" Height="19" Margin="209,104,0,0" TextWrapping="Wrap" Text="X" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Y9" HorizontalAlignment="Left" Height="19" Margin="244,104,0,0" TextWrapping="Wrap" Text="Y" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Z9" HorizontalAlignment="Left" Height="19" Margin="279,104,-16,0" TextWrapping="Wrap" Text="Z" VerticalAlignment="Top" Width="30"/>
+            </Grid>
+            <Grid>
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next" VerticalAlignment="Top" Margin="155,129,0,0"/>
+                <TextBox Name="X10" HorizontalAlignment="Left" Height="19" Margin="209,128,0,0" TextWrapping="Wrap" Text="X" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Y10" HorizontalAlignment="Left" Height="19" Margin="244,128,0,0" TextWrapping="Wrap" Text="Y" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Z10" HorizontalAlignment="Left" Height="19" Margin="279,128,-16,0" TextWrapping="Wrap" Text="Z" VerticalAlignment="Top" Width="30"/>
+            </Grid>
+            <Grid>
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next" VerticalAlignment="Top" Margin="155,153,0,0"/>
+                <TextBox Name="X11" HorizontalAlignment="Left" Height="19" Margin="209,152,0,0" TextWrapping="Wrap" Text="X" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Y11" HorizontalAlignment="Left" Height="19" Margin="244,152,0,0" TextWrapping="Wrap" Text="Y" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Z11" HorizontalAlignment="Left" Height="19" Margin="279,152,-16,0" TextWrapping="Wrap" Text="Z" VerticalAlignment="Top" Width="30"/>
+            </Grid>
+            <Grid>
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next" VerticalAlignment="Top" Margin="155,177,0,0"/>
+                <TextBox Name="X12" HorizontalAlignment="Left" Height="19" Margin="209,176,0,0" TextWrapping="Wrap" Text="X" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Y12" HorizontalAlignment="Left" Height="19" Margin="244,176,0,0" TextWrapping="Wrap" Text="Y" VerticalAlignment="Top" Width="30"/>
+                <TextBox Name="Z12" HorizontalAlignment="Left" Height="19" Margin="279,176,-16,0" TextWrapping="Wrap" Text="Z" VerticalAlignment="Top" Width="30"/>
+            </Grid>
+
+            <Button Content="Update" HorizontalAlignment="Left" Margin="110,202,0,0" VerticalAlignment="Top" Width="75" Click="UpdateButton_Click"/>
+            <Button Content="Exit" HorizontalAlignment="Left" Margin="110,227,0,0" VerticalAlignment="Top" Width="75" Click="CloseButton_Click"/>
+        </Grid>
+    </Grid>
+</Window>
