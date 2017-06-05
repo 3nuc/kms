@@ -253,32 +253,45 @@ namespace projekt_PO
             String[] line = data[0].Split(null); //rozdzielaj po spacji
 
             int numberOfVehicles, numberOfObstacles;
-            List<int> numberOfSegments = new List<int>();
+
 
             numberOfVehicles = Int32.Parse(line[0]);
             numberOfObstacles = Int32.Parse(line[1]);
-            for (int i = 2; i < numberOfVehicles+2; i++)
+            List<int> numberOfSegments = new List<int>(numberOfVehicles);
+            Console.WriteLine(numberOfVehicles);
+            for (int i = 0; i < numberOfVehicles; i++)
             {
-                numberOfSegments[i] = Int32.Parse(line[i]);
+                numberOfSegments.Add(Int32.Parse(line[i + 2]));
             }
-            for (int i = 1; i < numberOfVehicles; i++)
+            for (int i = 1; i < numberOfVehicles+1; i++)
             {
                 Vehicle currentVehicle;
                 line = data[i].Split(null);
                 currentVehicle = typeDecipherer(Char.Parse(line[0]));
-                for (int j = 1; j < numberOfSegments[i]+1; j++) //punkt poczatkowy, koncowy, predkosc, wysokosc
+                for (int j = 1;j < numberOfSegments[i-1]*5+1; j+=6) //punkt poczatkowy, koncowy, predkosc, wysokosc
                 {
-                    Segment currentSegment = new Segment(Double.Parse(line[i]), Double.Parse(line[i + 1]), Double.Parse(line[i + 2]), Double.Parse(line[i + 3]), Double.Parse(line[i + 4]), Double.Parse(line[i+5]));
+                    Console.WriteLine(i + " " +  j + " " + numberOfSegments[i-1]*5);
+                    Segment currentSegment = new Segment(Double.Parse(line[j]), Double.Parse(line[j+1]), Double.Parse(line[j + 2]), Double.Parse(line[j + 3]), Double.Parse(line[j + 4]), Double.Parse(line[j+5]));
                     currentVehicle.Routes.Add(currentSegment);
                 }
+                vehicles.Add(currentVehicle);
             }
-            for (int i = numberOfVehicles+2; i < numberOfVehicles+numberOfObstacles+2; i++) 
+            for (int i = numberOfVehicles+1; i < numberOfVehicles+numberOfObstacles+1; i++) 
             {
                 line = data[i].Split(null); //poz x, poz y, szerokosc, dlugosc, wysokosc
+                foreach (var item in line)
+                {
+                    Console.WriteLine(item); 
+                }
 
-                Obstacle currentObstacle = new Obstacle(Double.Parse(line[0]), Double.Parse(line[1]), Double.Parse(line[3]), Double.Parse(line[4]), Double.Parse(line[5]));
-                
+                Console.WriteLine("I: " +i);
+
+                Obstacle currentObstacle = new Obstacle(Double.Parse(line[0]), Double.Parse(line[1]), Double.Parse(line[2]), Double.Parse(line[3]), Double.Parse(line[4]));
+
+                obstacles.Add(currentObstacle);
             }
+
+            
 
             return true;
         }
