@@ -235,18 +235,80 @@ namespace projekt_PO
         /// </summary>
         /// <param name="PATH">Ścieżka do pliku w formacie "X:\folder\text.txt"</param>
         /// <returns>Powodzenie operacji ładowania</returns>
-        public bool loadObstaclesFromFile(String PATH)
+        public bool loadMapFromFile(String PATH)
         {
-            String[] data = System.IO.File.ReadAllLines(@PATH); //plik z PATH ma specyfikacje Obstacle każdy w oddzielnej linii (5 Obstacle = 5 linii)
-            foreach (String item in data)
+            Vehicle typeDecipherer(char type)
             {
-                String[] line = item.Split(null); //rozdzielaj po spacji
-                Obstacle currentlyAdded = new Obstacle(Int32.Parse(line[0]), Int32.Parse(line[1]), Int32.Parse(line[2]), Int32.Parse(line[3]), Int32.Parse(line[4]));
-                Console.WriteLine("ehh:" + Int32.Parse(line[0]));
-                Obstacles.Add(currentlyAdded);
+                if (type == 'h') return new Helicopter();
+                else if (type == 'g') return new Glider();
+                else if (type == 'p') return new Plane();
+                else if (type == 'b') return new Balloon();
+                else return new Vehicle();
             }
+
+
+
+            String[] data = System.IO.File.ReadAllLines(@PATH); //plik z PATH ma specyfikacje Obstacle każdy w oddzielnej linii (5 Obstacle = 5 linii)
+
+            String[] line = data[0].Split(null); //rozdzielaj po spacji
+
+            int numberOfVehicles, numberOfObstacles;
+
+
+            numberOfVehicles = Int32.Parse(line[0]);
+            numberOfObstacles = Int32.Parse(line[1]);
+            List<int> numberOfSegments = new List<int>(numberOfVehicles);
+            Console.WriteLine(numberOfVehicles);
+            for (int i = 0; i < numberOfVehicles; i++)
+            {
+                numberOfSegments.Add(Int32.Parse(line[i + 2]));
+            }
+            for (int i = 1; i < numberOfVehicles + 1; i++)
+            {
+                Vehicle currentVehicle;
+                line = data[i].Split(null);
+                currentVehicle = typeDecipherer(Char.Parse(line[0]));
+                currentVehicle.Position = new Point(Double.Parse(line[1]), Double.Parse(line[2]));
+                for (int j = 1; j < numberOfSegments[i - 1] * 5 + 1; j += 6) //punkt poczatkowy, koncowy, predkosc, wysokosc
+                {
+                    Console.WriteLine(i + " " + j + " " + numberOfSegments[i - 1] * 5);
+                    Segment currentSegment = new Segment(Double.Parse(line[j]), Double.Parse(line[j + 1]), Double.Parse(line[j + 2]), Double.Parse(line[j + 3]), Double.Parse(line[j + 4]), Double.Parse(line[j + 5]));
+                    currentVehicle.Routes.Add(currentSegment);
+                }
+                vehicles.Add(currentVehicle);
+            }
+            for (int i = numberOfVehicles + 1; i < numberOfVehicles + numberOfObstacles + 1; i++)
+            {
+                line = data[i].Split(null); //poz x, poz y, szerokosc, dlugosc, wysokosc
+                foreach (var item in line)
+                {
+                    Console.WriteLine(item);
+                }
+
+                Console.WriteLine("I: " + i);
+
+                Obstacle currentObstacle = new Obstacle(Double.Parse(line[0]), Double.Parse(line[1]), Double.Parse(line[2]), Double.Parse(line[3]), Double.Parse(line[4]));
+
+                obstacles.Add(currentObstacle);
+            }
+
+
+
             return true;
         }
+
+        //public bool loadVehiclesFromFile(String PATH)
+        //{
+        //    String[] data = System.IO.File.ReadAllLines(@PATH); //plik z PATH ma specyfikacje Obstacle każdy w oddzielnej linii (5 Obstacle = 5 linii)
+        //    Vehicle currentlyAdded();
+        //    foreach (String item in data)
+        //    {
+        //        String[] line = item.Split(null); //rozdzielaj po spacji
+        //        if (line[0]=="H")
+        //        Console.WriteLine("ehh:" + Int32.Parse(line[0]));
+        //        Obstacles.Add(currentlyAdded);
+        //    }
+        //}
 
         /// <summary>
         /// Przesuwa wszystkie pojazdy latające w tej mapie o wartość swojej prędkości w odpowiednim kierunku.
@@ -312,6 +374,16 @@ namespace projekt_PO
                 foreach (Obstacle obs in list)
                 {
                     colls.Add(new Collision(vhc, obs));
+                }
+            }
+
+            foreach (Obstacle obst in obstacles)
+            {
+                List<Obstacle> list = obst.detectCollisions(map);
+
+                foreach (Vehicle vehobst in list)
+                {
+                    colls.Add(new Collision(vehobst, obst));
                 }
             }
 
@@ -687,6 +759,14 @@ namespace projekt_PO
             end = new Point(xend, yend);
         }
 
+        public Segment(double xbegin, double ybegin, double xend, double yend, double _speed, double _height)
+        {
+            begin = new Point(xbegin, ybegin);
+            end = new Point(xend, yend);
+            speed = _speed;
+            height = _height;
+        }
+
         //kod autorstwa Martin Thoma (licencja poniżej)
         public Point[] getBoundingBox()
         {
@@ -713,6 +793,7 @@ namespace projekt_PO
             speed = _speed;
             height = _height;
         }
+
 
         ///<summary>Zwraca odcinek idący od (0,0) do górnego prawego rogu mapy</summary>
         public Segment()

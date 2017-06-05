@@ -336,7 +336,7 @@ namespace PO_wpf
             if (result.HasValue && result.Value)
             {
                 MapPath = dlg.FileName;
-                map.loadObstaclesFromFile(@MapPath);
+                map.loadMapFromFile(@MapPath);
             }
         }
 
